@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Coinbase Wallet Clone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Tailwind CDN for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html { font-size: 14px; }
+    body { background: #111827; }
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    ::-webkit-scrollbar { display: none; }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    html { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans text-sm min-h-screen">
+
+  <!-- Header -->
+  <header class="w-full bg-gray-800 flex items-center justify-between px-6 py-4 shadow-sm">
+    <h1 class="text-xl font-bold tracking-tight text-white">Coinbase Wallet</h1>
+    <div class="flex items-center space-x-4">
+      <button class="bg-indigo-600 hover:bg-indigo-500 text-xs rounded px-4 py-2 font-medium transition">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="flex flex-row min-h-[90vh]">
+    <!-- Sidebar -->
+    <aside class="hidden md:flex flex-col w-56 bg-gray-800 p-4 space-y-2 border-r border-gray-700">
+      <button class="flex items-center px-3 py-2 rounded-md text-gray-200 hover:bg-gray-700 transition text-sm font-medium"><span class="mr-3 text-lg">🏠</span>Dashboard</button>
+      <button class="flex items-center px-3 py-2 rounded-md text-gray-200 hover:bg-gray-700 transition text-sm font-medium"><span class="mr-3 text-lg">👛</span>Wallet</button>
+      <button class="flex items-center px-3 py-2 rounded-md text-gray-200 hover:bg-gray-700 transition text-sm font-medium"><span class="mr-3 text-lg">📤</span>Send</button>
+      <button class="flex items-center px-3 py-2 rounded-md text-gray-200 hover:bg-gray-700 transition text-sm font-medium"><span class="mr-3 text-lg">📥</span>Receive</button>
+      <button class="flex items-center px-3 py-2 rounded-md text-gray-200 hover:bg-gray-700 transition text-sm font-medium"><span class="mr-3 text-lg">💸</span>Transactions</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 sm:p-6">
+      <section class="mx-auto max-w-5xl">
+
+        <!-- Wallet Card -->
+        <div class="flex flex-col md:flex-row gap-6 mb-6">
+          <div class="flex-1 bg-gradient-to-br from-indigo-800 to-indigo-600 rounded-xl shadow-lg p-6 flex flex-col justify-between min-w-[270px]">
+            <div>
+              <div class="flex items-center mb-4">
+                <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="ETH" class="h-7 w-7 mr-3" />
+                <span class="text-lg font-semibold">ETH Wallet</span>
+              </div>
+              <div class="text-2xl font-bold text-white" id="wallet-balance-usd">$2,450.34</div>
+              <div class="text-xs text-gray-200" id="wallet-balance-eth">0.9876 ETH</div>
+            </div>
+            <div class="flex space-x-2 mt-6">
+              <button id="send-btn" class="px-4 py-2 rounded text-xs font-semibold transition bg-indigo-500 text-white hover:bg-indigo-400">Send</button>
+              <button id="receive-btn" class="px-4 py-2 rounded text-xs font-semibold transition bg-gray-700 text-white hover:bg-gray-600">Receive</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transactions -->
+        <div class="bg-gray-800 rounded-lg p-4">
+          <h2 class="text-base font-semibold mb-3 text-white">Recent Transactions</h2>
+          <table class="w-full text-xs">
+            <thead>
+              <tr class="text-left text-gray-300">
+                <th>Date</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700" id="tx-table-body">
+              <tr class="hover:bg-gray-700/30">
+                <td>2025-07-25</td>
+                <td>Send</td>
+                <td class="text-red-400">-0.02 ETH</td>
+                <td>Completed</td>
+              </tr>
+              <tr class="hover:bg-gray-700/30">
+                <td>2025-07-24</td>
+                <td>Receive</td>
+                <td class="text-green-400">+0.15 ETH</td>
+                <td>Completed</td>
+              </tr>
+              <tr class="hover:bg-gray-700/30">
+                <td>2025-07-22</td>
+                <td>Send</td>
+                <td class="text-red-400">-0.05 ETH</td>
+                <td>Pending</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Modal (hidden by default) -->
+        <div id="modal-bg" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+          <div class="bg-gray-900 rounded-lg p-6 w-full max-w-sm shadow-lg">
+            <h3 id="modal-title" class="text-base font-bold mb-4"></h3>
+            <div id="modal-send" class="hidden">
+              <div class="mb-3">
+                <label class="block text-xs text-gray-300 mb-1">Recipient Address</label>
+                <input id="input-address" type="text" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-xs text-gray-100 focus:outline-none focus:border-indigo-500 transition" placeholder="Enter wallet address">
+              </div>
+              <div class="mb-3">
+                <label class="block text-xs text-gray-300 mb-1">Amount</label>
+                <input id="input-amount" type="number" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-xs text-gray-100 focus:outline-none focus:border-indigo-500 transition" placeholder="0.00">
+              </div>
+            </div>
+            <div id="modal-receive" class="hidden flex flex-col items-center">
+              <div class="bg-gray-800 p-4 rounded mb-2 w-full">
+                <span class="text-xs text-gray-300">Your Address</span>
+                <div class="font-mono text-xs mt-1 select-all break-all" id="wallet-address">0x1234abcd5678efgh9012ijklmn3456opqrst7890</div>
+              </div>
+              <img src="https://api.qrserver.com/v1/create-qr-code/?data=0x1234abcd5678efgh9012ijklmn3456opqrst7890&size=112x112" alt="QR Code" class="w-28 h-28" />
+            </div>
+            <div class="flex justify-end gap-2 mt-4">
+              <button id="close-btn" class="px-4 py-2 rounded text-xs font-semibold transition bg-gray-700 text-white hover:bg-gray-600">Close</button>
+              <button id="modal-action-btn" class="px-4 py-2 rounded text-xs font-semibold transition bg-indigo-500 text-white hover:bg-indigo-400 hidden">Send</button>
+            </div>
+          </div>
+        </div>
+        <!-- Modal End -->
+
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Modal logic
+    const modalBg = document.getElementById('modal-bg');
+    const sendBtn = document.getElementById('send-btn');
+    const receiveBtn = document.getElementById('receive-btn');
+    const closeBtn = document.getElementById('close-btn');
+    const modalTitle = document.getElementById('modal-title');
+    const modalSend = document.getElementById('modal-send');
+    const modalReceive = document.getElementById('modal-receive');
+    const modalActionBtn = document.getElementById('modal-action-btn');
+    const inputAddress = document.getElementById('input-address');
+    const inputAmount = document.getElementById('input-amount');
+    const txTableBody = document.getElementById('tx-table-body');
+
+    function openModal(type) {
+      modalBg.classList.remove('hidden');
+      if (type === 'send') {
+        modalTitle.textContent = 'Send Crypto';
+        modalSend.classList.remove('hidden');
+        modalReceive.classList.add('hidden');
+        modalActionBtn.classList.remove('hidden');
+        modalActionBtn.textContent = "Send";
+      } else if (type === 'receive') {
+        modalTitle.textContent = 'Receive Crypto';
+        modalSend.classList.add('hidden');
+        modalReceive.classList.remove('hidden');
+        modalActionBtn.classList.add('hidden');
+      }
+    }
+    function closeModal() {
+      modalBg.classList.add('hidden');
+      inputAddress.value = '';
+      inputAmount.value = '';
+    }
+    sendBtn.onclick = () => openModal('send');
+    receiveBtn.onclick = () => openModal('receive');
+    closeBtn.onclick = closeModal;
+
+    modalActionBtn.onclick = function() {
+      // Example "send" logic
+      const address = inputAddress.value.trim();
+      const amount = inputAmount.value.trim();
+      if (!address || !amount || isNaN(amount)) {
+        alert('Please enter a valid address and amount.');
+        return;
+      }
+      // Add to transaction table (simulate)
+      const newRow = document.createElement('tr');
+      newRow.className = "hover:bg-gray-700/30";
+      newRow.innerHTML = `<td>${(new Date()).toISOString().split('T')[0]}</td>
+        <td>Send</td>
+        <td class="text-red-400">-${parseFloat(amount).toFixed(2)} ETH</td>
+        <td>Pending</td>`;
+      txTableBody.insertBefore(newRow, txTableBody.firstChild);
+      closeModal();
+      alert('Transaction sent (simulation).');
+    };
+
+    // Dismiss modal with Esc
+    document.addEventListener('keydown', function(e) {
+      if (!modalBg.classList.contains('hidden') && e.key === "Escape") closeModal();
+    });
+
+    // Responsive sidebar toggle for mobile (add if needed)
+    // You can add a hamburger icon and JS to show/hide the sidebar on mobile if you wish.
+  </script>
+</body>
+</html>
